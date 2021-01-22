@@ -33,7 +33,7 @@ public class AddNewSession extends AppCompatActivity {
 
     ActivityAddNewSessionBinding binding;
     private final Calendar myCalendar = Calendar.getInstance();
-    private String id,  date,  day,  time,  topic,  counter;
+    private String id,  date,  day,  time, etime,  topic,  counter;
     private String userId,tuitionid;
     private DatabaseReference tuitionRef,sessionRef;
 
@@ -51,8 +51,12 @@ public class AddNewSession extends AppCompatActivity {
         int day = now.get(Calendar.DAY_OF_MONTH);
         int today = now.get(Calendar.DAY_OF_WEEK);
         int hour = now.get(Calendar.HOUR_OF_DAY);
+        int ehour = now.get(Calendar.HOUR_OF_DAY)+1;
         int minte = now.get(Calendar.MINUTE);
+        long integerRepresentation = now.getTimeInMillis();
 
+        Calendar cend=Calendar.getInstance();
+        cend.setTimeInMillis(integerRepresentation+3600000);
 
 
 
@@ -63,7 +67,8 @@ public class AddNewSession extends AppCompatActivity {
 
 
         binding.inputDate.setText(sdf.format(now.getTime()));
-        binding.inputTime.setText(stf.format(now.getTime()));
+        binding.inputSTime.setText(stf.format(now.getTime()));
+        binding.inputETime.setText(stf.format(cend.getTime()));
         binding.inputDay.setText(GetDAY(today));
 
 
@@ -82,15 +87,26 @@ public class AddNewSession extends AppCompatActivity {
             nDate.show();
         });
 
-        binding.inputTime.setOnClickListener(v -> {
+        binding.inputSTime.setOnClickListener(v -> {
 
             TimePickerDialog nTime = new TimePickerDialog(this, R.style.datepicker, (view, hourOfDay, minute) -> {
                 myCalendar.set(Calendar.HOUR_OF_DAY, hour);
                 myCalendar.set(Calendar.MINUTE, minte);
 
 
-                binding.inputTime.setText(sdf.format(myCalendar.getTime()));
+                binding.inputSTime.setText(sdf.format(myCalendar.getTime()));
             }, hour, minte, false);
+            nTime.show();
+        });
+
+        binding.inputETime.setOnClickListener(v -> {
+
+            TimePickerDialog nTime = new TimePickerDialog(this, R.style.datepicker, (view, hourOfDay, minute) -> {
+                myCalendar.set(Calendar.HOUR_OF_DAY, ehour);
+                myCalendar.set(Calendar.MINUTE, minte);
+
+                binding.inputETime.setText(sdf.format(myCalendar.getTime()));
+            }, ehour, minte, false);
             nTime.show();
         });
 
@@ -144,7 +160,7 @@ public class AddNewSession extends AppCompatActivity {
 
             }
         });
-        SessionInfo sessionInfo=new SessionInfo(id,date,time,day,topic,counter);
+        SessionInfo sessionInfo=new SessionInfo(id,date,time,etime,day,topic,counter);
         tuitionRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
             Intent intent =new Intent(this,TuitionDetails.class);
@@ -160,9 +176,15 @@ public class AddNewSession extends AppCompatActivity {
             return 0;
         }
 
-        time=binding.inputTime.getText().toString();
+        time=binding.inputSTime.getText().toString();
         if (time.isEmpty() || time.length()<6){
-            binding.inputTime.setError("enter valid time");
+            binding.inputSTime.setError("enter valid time");
+            return 0;
+        }
+
+        etime=binding.inputETime.getText().toString();
+        if (etime.isEmpty() || etime.length()<6){
+            binding.inputETime.setError("enter valid time");
             return 0;
         }
 

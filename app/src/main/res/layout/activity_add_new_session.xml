@@ -2,6 +2,7 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <RelativeLayout
 
         android:layout_width="match_parent"
@@ -9,25 +10,24 @@
         tools:context="view.activity.AddNewSession">
 
         <TextView
-            android:paddingLeft="20dp"
-            android:textSize="15dp"
             android:id="@+id/toolbarview"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:background="@color/primary_dark"
             android:gravity="center_vertical"
+            android:paddingLeft="20dp"
             android:text="Add New Session"
-            android:textColor="@color/white" />
-
+            android:textColor="@color/white"
+            android:textSize="15dp" />
 
 
         <LinearLayout
-            android:orientation="vertical"
-            android:layout_below="@+id/toolbarview"
-            android:padding="10dp"
-            android:layout_margin="15dp"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:layout_below="@+id/toolbarview"
+            android:layout_margin="15dp"
+            android:orientation="vertical"
+            android:padding="10dp">
 
 
             <com.google.android.material.textfield.TextInputLayout
@@ -53,10 +53,24 @@
                 android:layout_marginBottom="3dp">
 
                 <EditText
-                    android:id="@+id/input_Time"
+                    android:id="@+id/input_sTime"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Time"
+                    android:hint="Start Time"
+                    android:inputType="time" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="3dp">
+
+                <EditText
+                    android:id="@+id/input_eTime"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="End Time"
                     android:inputType="time" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -73,7 +87,7 @@
                     android:hint="Day"
                     android:inputType="datetime" />
             </com.google.android.material.textfield.TextInputLayout>
-            <!-- Address Label -->
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,9 +101,6 @@
                     android:hint="Topic"
                     android:inputType="text" />
             </com.google.android.material.textfield.TextInputLayout>
-
-
-
 
 
             <Button

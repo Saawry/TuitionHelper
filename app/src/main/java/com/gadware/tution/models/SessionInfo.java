@@ -5,15 +5,17 @@ public class SessionInfo {
     private String date;
     private String day;
     private String time;
+    private String eTime;
     private String topic;
     private String counter;
 
 
-    public SessionInfo(String id, String date, String day, String time, String topic, String counter) {
+    public SessionInfo(String id, String date, String day, String time, String eTime, String topic, String counter) {
         this.id = id;
         this.date = date;
         this.day = day;
         this.time = time;
+        this.eTime = eTime;
         this.topic = topic;
         this.counter = counter;
     }
@@ -48,6 +50,14 @@ public class SessionInfo {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String geteTime() {
+        return eTime;
+    }
+
+    public void seteTime(String eTime) {
+        this.eTime = eTime;
     }
 
     public String getTopic() {
