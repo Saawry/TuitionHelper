@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "288241732235",
+    "firebase_url": "https://tuition-helper-de173-default-rtdb.firebaseio.com",
+    "project_id": "tuition-helper-de173",
+    "storage_bucket": "tuition-helper-de173.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288241732235:android:3dbc675a36898f38f6628e",
+        "android_client_info": {
+          "package_name": "com.gadware.tution"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288241732235-q43dco9eun1ptg48ppe5g1i80mt7cbnv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBU2vaNUKUjky0P0moWzczUEejJ4VCx4Rc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288241732235-q43dco9eun1ptg48ppe5g1i80mt7cbnv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

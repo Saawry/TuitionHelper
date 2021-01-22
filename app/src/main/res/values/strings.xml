@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Tuition Helper</string>
+    <string name="todo">TODO</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="no_code_tv">Didn\'t get a code?</string>
+    <string name="resend_tv">
+        <u>Resend Code</u>>
+    </string>
+    <string name="wait">\" wait : \"</string>
+
+</resources>
