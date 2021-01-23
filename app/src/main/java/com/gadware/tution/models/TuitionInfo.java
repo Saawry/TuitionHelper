@@ -11,8 +11,39 @@ public class TuitionInfo {
     private String remuneration;
     private String Status;
     private String ImageUri;
+    private String sDate;
+    private String eDate;
 
     public TuitionInfo() {
+    }
+
+    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status, String sDate, String eDate) {
+        this.id = id;
+        this.studentName = studentName;
+        this.location = location;
+        this.mobile = mobile;
+        this.totalDays = totalDays;
+        this.completedDays = completedDays;
+        this.weeklyDays = weeklyDays;
+        this.remuneration = remuneration;
+        Status = status;
+        this.sDate = sDate;
+        this.eDate = eDate;
+    }
+
+    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status, String imageUri, String sDate, String eDate) {
+        this.id = id;
+        this.studentName = studentName;
+        this.location = location;
+        this.mobile = mobile;
+        this.totalDays = totalDays;
+        this.completedDays = completedDays;
+        this.weeklyDays = weeklyDays;
+        this.remuneration = remuneration;
+        Status = status;
+        ImageUri = imageUri;
+        this.sDate = sDate;
+        this.eDate = eDate;
     }
 
     public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status, String imageUri) {
@@ -118,5 +149,21 @@ public class TuitionInfo {
 
     public void setImageUri(String imageUri) {
         ImageUri = imageUri;
+    }
+
+    public String getsDate() {
+        return sDate;
+    }
+
+    public void setsDate(String sDate) {
+        this.sDate = sDate;
+    }
+
+    public String geteDate() {
+        return eDate;
+    }
+
+    public void seteDate(String eDate) {
+        this.eDate = eDate;
     }
 }

@@ -9,98 +9,194 @@
         android:orientation="vertical"
         tools:context=".Activities.TuitionDetails">
 
-        <include layout="@layout/tuition_card" />
-
-        <LinearLayout
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:weightSum="3">
+            android:elevation="4dp"
+            app:cardCornerRadius="6dp">
 
-            <TextView
-                android:layout_width="0dp"
+<androidx.cardview.widget.CardView
+    android:layout_margin="5dp"
+    android:layout_width="70dp"
+    android:layout_height="70dp"
+    app:cardCornerRadius="70dp"
+    android:padding="6dp">
+<ImageView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/tuitionDImg"/>
+</androidx.cardview.widget.CardView>
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:padding="3dp"
-                android:text="Start"
-                android:textColor="@color/white" />
+                android:layout_weight="4"
+                android:orientation="vertical"
+                android:padding="5dp">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="3dp"
-                android:text="00.00"
-                android:textColor="@color/white" />
+                <LinearLayout
+                    android:layout_marginLeft="75dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:padding="3dp"
-                android:text="Start"
-                android:textColor="@color/white" />
+                    <TextView
+                        android:textColor="@color/primary_dark"
+                        android:textStyle="bold|italic"
+                        android:id="@+id/tuitionDSName"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.2"
+                        android:padding="5dp"
+                        android:text="Student Name"
 
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="3dp"
-                android:text="00.00"
-                android:textColor="@color/white" />
-        </LinearLayout>
+                        android:textSize="19dp" />
 
-        <LinearLayout
+                    <TextView
+                        android:textColor="@color/teal_700"
+                        android:id="@+id/tuitionDWD"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".8"
+                        android:padding="5dp"
+                        android:text="Weekly 0 days"
+                        android:textAlignment="center"
+                        android:textSize="16dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_marginLeft="75dp"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:weightSum="2">
+
+                    <TextView
+                        android:id="@+id/tuitionDMobile"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="5dp"
+                        android:text="01000000000"
+                        android:textSize="17dp" />
+
+                    <TextView
+                        android:id="@+id/tuitionDDSpin"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:padding="5dp"
+                        android:text="Sat,Sun,Mon"
+                        android:textAlignment="center"
+                        android:textSize="16dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    android:weightSum="3">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".4"
+                        android:padding="3dp"
+                        android:text="Start" />
+
+                    <TextView
+                        android:id="@+id/tuitionDSDate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".7"
+                        android:padding="3dp"
+                        android:text="00.00" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".3"
+                        android:padding="3dp"
+                        android:text="End" />
+
+                    <TextView
+                        android:id="@+id/tuitionDEDate"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".7"
+                        android:padding="3dp"
+                        android:text="00.00" />
+                    <TextView
+                        android:id="@+id/tuitionDLocation"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".9"
+                        android:padding="3dp"
+                        android:text="Location"
+                        android:textAlignment="center" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="5dp"
+                    android:weightSum="4">
+
+                    <TextView
+                        android:textColor="@color/primary_dark"
+                        android:id="@+id/tuitionDDTD"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="2.3"
+                        android:padding="5dp"
+                        android:text="Completed 00 of 00 days"
+                        android:textAlignment="center"
+                        />
+
+                    <TextView
+                        android:textAlignment="center"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1.2"
+                        android:padding="3dp"
+                        android:text="Remuneration" />
+
+                    <TextView
+                        android:id="@+id/tuitionDRemu"
+                        android:textColor="@color/primary_dark"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight=".5"
+                        android:padding="3dp"
+                        android:text="000" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
+
+        <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp"
-            android:orientation="horizontal"
-            android:padding="5dp"
-            android:weightSum="3">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:padding="3dp"
-                android:text="Mobile"
-                android:textColor="@color/white" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="3dp"
-                android:text="01xxx"
-                android:textColor="@color/white" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:padding="3dp"
-                android:text="Remuneration"
-                android:textColor="@color/white" />
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:padding="3dp"
-                android:text="000"
-                android:textColor="@color/white" />
-        </LinearLayout>
+            android:layout_marginLeft="25dp"
+            android:layout_marginRight="25dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:text="Add New Session"
+            android:textColor="@color/white"
+            android:textAllCaps="false"
+            android:id="@+id/tuitionDAdnSsn"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/sessionRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="5dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
-            tools:listitem="@layout/tuition_card" />
+            tools:listitem="@layout/session_card" />
     </LinearLayout>
 </layout>

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -31,7 +30,6 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:text="Session date day"
-                        android:textAlignment="center"
                         android:textSize="25dp" />
 
                     <TextView
