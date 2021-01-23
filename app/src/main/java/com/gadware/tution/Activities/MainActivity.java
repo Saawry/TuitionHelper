@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private FirebaseDatabase fireDb;
+    private DatabaseReference tuitionRef;
     private String status = "";
 
     @Override
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.favAddNewTuitionBtn.setOnClickListener(v ->
 
-                startActivity(new Intent(MainActivity.this, AddNewSession.class))
+                startActivity(new Intent(MainActivity.this, AddNewTuition.class))
         );
 
     }

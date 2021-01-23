@@ -3,7 +3,10 @@ package com.gadware.tution.models;
 public class User {
     private String imageUrl,uid,email, password,address, mobile,name,status;
 
-    public User(String uid, String email, String password, String address, String mobile, String name,String status) {
+    public User() {
+    }
+
+    public User(String uid, String email, String password, String address, String mobile, String name, String status) {
         this.uid = uid;
         this.email = email;
         this.password = password;

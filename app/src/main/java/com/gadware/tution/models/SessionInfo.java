@@ -9,6 +9,8 @@ public class SessionInfo {
     private String topic;
     private String counter;
 
+    public SessionInfo() {
+    }
 
     public SessionInfo(String id, String date, String day, String time, String eTime, String topic, String counter) {
         this.id = id;
