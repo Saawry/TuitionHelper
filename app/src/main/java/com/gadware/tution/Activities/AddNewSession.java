@@ -43,7 +43,8 @@ public class AddNewSession extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_session);
 
-        //getExtra() as tuitionId
+        tuitionid=getIntent().getExtras().get("Tuition_id").toString();
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
         Calendar now = Calendar.getInstance();
         int yr = now.get(Calendar.YEAR);
@@ -119,7 +120,7 @@ public class AddNewSession extends AppCompatActivity {
     }
 
     private void InsertNewSession() {
-        tuitionRef= FirebaseDatabase.getInstance().getReference().child("SessionInfo").child(tuitionid).push();
+        tuitionRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
         id=tuitionRef.getKey();
 //        tuitionRef.addChildEventListener(new ChildEventListener() {
 //            @Override
@@ -164,7 +165,7 @@ public class AddNewSession extends AppCompatActivity {
         tuitionRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
             Intent intent =new Intent(this,TuitionDetails.class);
-            intent.putExtra("tuitionId",tuitionid);
+            intent.putExtra("Tuition_id",tuitionid);
             startActivity(intent);
         }).addOnFailureListener(e -> Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show());
     }

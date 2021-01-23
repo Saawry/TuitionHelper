@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TuitionHelper">
-        <activity android:name=".Activities.TuitionDetails"></activity>
+        <activity android:name=".Activities.SessionDetails"></activity>
+        <activity android:name=".Activities.TuitionDetails" />
         <activity android:name=".Activities.AddNewSession" />
         <activity android:name=".Activities.WeeklySchedule" />
         <activity android:name=".Activities.UserProfile" />
