@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseDatabase firedb;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
-    private DatabaseReference tuitionRef,tuitionInfoRef;
+    private DatabaseReference tuitionRef;
     private String status = "",mUserId;
 
     @Override
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         firedb=FirebaseDatabase.getInstance();
+        mUserId=mUser.getUid();
         VerifyUserExistence();
 
         binding.tuitionRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -68,8 +69,27 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        tuitionRef=FirebaseDatabase.getInstance().getReference("Users").child(mUserId).child("Tuition List");
+        tuitionRef=FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
         //tuitionInfoRef=FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
+       tuitionRef.addValueEventListener(new ValueEventListener() {
+           @Override
+           public void onDataChange(@NonNull DataSnapshot snapshot) {
+               if (snapshot.hasChildren()){
+                   RetriveTuitionInfoList();
+               }
+           }
+
+           @Override
+           public void onCancelled(@NonNull DatabaseError error) {
+               Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+           }
+       });
+
+
+
+    }
+
+    private void RetriveTuitionInfoList() {
         FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<TuitionInfo>().setQuery(tuitionRef, TuitionInfo.class).build();
 
         final FirebaseRecyclerAdapter<TuitionInfo, TuitionssViewHolder> adapter
@@ -127,9 +147,6 @@ public class MainActivity extends AppCompatActivity {
 
         binding.tuitionRecycler.setAdapter(adapter);
         adapter.startListening();
-
-
-
     }
 
 

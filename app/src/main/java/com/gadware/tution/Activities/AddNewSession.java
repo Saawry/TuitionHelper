@@ -120,40 +120,25 @@ public class AddNewSession extends AppCompatActivity {
     }
 
     private void InsertNewSession() {
-        tuitionRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
-        id=tuitionRef.getKey();
-//        tuitionRef.addChildEventListener(new ChildEventListener() {
-//            @Override
-//            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-//
-//            }
-//
-//            @Override
-//            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-//
-//            }
-//
-//            @Override
-//            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-//
-//            }
-//
-//            @Override
-//            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
-
-
+        tuitionRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid);
         tuitionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                counter=String.valueOf(snapshot.getChildrenCount()-1);//if new push not added, remove -1
+                long cc=snapshot.getChildrenCount();
+                cc++;
+                counter=String.valueOf(cc);
+                DatabaseReference sessnRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
+                id=sessnRef.getKey();
+
+                SessionInfo sessionInfo=new SessionInfo(id,date,day,time,etime,topic,counter);
+                sessnRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
+                    DatabaseReference cntRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(userId).child(tuitionid).getRef();
+                    cntRef.child("completedDays").setValue(counter);
+                    Toast.makeText(AddNewSession.this, "Added Successfully", Toast.LENGTH_SHORT).show();
+                    Intent intent =new Intent(AddNewSession.this,TuitionDetails.class);
+                    intent.putExtra("Tuition_id",tuitionid);
+                    startActivity(intent);
+                }).addOnFailureListener(e -> Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show());
             }
 
             @Override
@@ -161,13 +146,8 @@ public class AddNewSession extends AppCompatActivity {
 
             }
         });
-        SessionInfo sessionInfo=new SessionInfo(id,date,time,etime,day,topic,counter);
-        tuitionRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
-            Toast.makeText(this, "Added Successfully", Toast.LENGTH_SHORT).show();
-            Intent intent =new Intent(this,TuitionDetails.class);
-            intent.putExtra("Tuition_id",tuitionid);
-            startActivity(intent);
-        }).addOnFailureListener(e -> Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show());
+
+
     }
 
     private int validate() {

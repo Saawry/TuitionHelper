@@ -12,6 +12,15 @@ public class SessionInfo {
     public SessionInfo() {
     }
 
+    public SessionInfo(String id, String date, String day, String time, String eTime, String topic) {
+        this.id = id;
+        this.date = date;
+        this.day = day;
+        this.time = time;
+        this.eTime = eTime;
+        this.topic = topic;
+    }
+
     public SessionInfo(String id, String date, String day, String time, String eTime, String topic, String counter) {
         this.id = id;
         this.date = date;

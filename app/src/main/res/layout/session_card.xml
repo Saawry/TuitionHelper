@@ -30,7 +30,7 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:text="Session date day"
-                        android:textSize="25dp" />
+                        android:textSize="21dp" />
 
                     <TextView
                         android:id="@+id/sessionCardCount"

@@ -49,7 +49,7 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:text="Tuition Title"
-                        android:textSize="25dp" />
+                        android:textSize="20dp" />
 
                     <TextView
                         android:id="@+id/tuitionCardLocation"
@@ -59,7 +59,7 @@
                         android:padding="5dp"
                         android:text="Location"
                         android:textAlignment="center"
-                        android:textSize="20dp" />
+                        android:textSize="16dp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -75,7 +75,7 @@
                         android:padding="5dp"
                         android:text="0 of 0 days"
                         android:textAlignment="center"
-                        android:textSize="20dp" />
+                        android:textSize="16dp" />
 
                     <TextView
                         android:id="@+id/tuitionCardWeekly"
@@ -85,7 +85,7 @@
                         android:padding="5dp"
                         android:text="weekly 0 days"
                         android:textAlignment="center"
-                        android:textSize="20dp" />
+                        android:textSize="16dp" />
                 </LinearLayout>
             </LinearLayout>
 <ImageView
