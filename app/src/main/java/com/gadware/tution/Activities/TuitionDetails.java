@@ -36,7 +36,7 @@ public class TuitionDetails extends AppCompatActivity {
     ActivityTuitionDetailsBinding binding;
 
     private DatabaseReference tuitionRef, sessionRef;
-    private String  mUserId, cTuitionId;
+    private String  mUserId, cTuitionId,completedDays;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +48,12 @@ public class TuitionDetails extends AppCompatActivity {
         mUserId= FirebaseAuth.getInstance().getUid();
         binding.sessionRecycler.setLayoutManager(new LinearLayoutManager(this));
         RetriveTuitionInfo();
+        RetriveSessionInfoList();
 
         binding.tuitionDAdnSsn.setOnClickListener(v -> {
             Intent nSession = new Intent(TuitionDetails.this, AddNewSession.class);
             nSession.putExtra("Tuition_id", cTuitionId);
+            nSession.putExtra("completedDays", completedDays);
             startActivity(nSession);
         });
 
@@ -114,8 +116,8 @@ public class TuitionDetails extends AppCompatActivity {
                 binding.tuitionDRemu.setText(snapshot.child("remuneration").getValue().toString());
 
                 String td = snapshot.child("totalDays").getValue().toString();
-                String cd = snapshot.child("completedDays").getValue().toString();
-                binding.tuitionDDTD.setText("Completed " + cd + " of " + td + " days");
+                completedDays = snapshot.child("completedDays").getValue().toString();
+                binding.tuitionDDTD.setText("Completed " + completedDays + " of " + td + " days");
 
                 if (snapshot.hasChild("ImageUri")) {
                     Glide.with(TuitionDetails.this).load(snapshot.child("ImageUri").getValue().toString()).into(binding.tuitionDImg);
@@ -149,9 +151,8 @@ public class TuitionDetails extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
+    private void RetriveSessionInfoList() {
+
         sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(cTuitionId);
         FirebaseRecyclerOptions<SessionInfo> options = new FirebaseRecyclerOptions.Builder<SessionInfo>().setQuery(sessionRef, SessionInfo.class).build();
         final FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder> adapter
@@ -172,7 +173,7 @@ public class TuitionDetails extends AppCompatActivity {
 
                         holder.sBinding.sessionCardDD.setText(dt + "   " + dy);
                         holder.sBinding.sessionCardTT.setText(t + "  to " + et);
-                        //holder.sBinding.sessionCardCount.setText(dataSnapshot.child("counter").getValue().toString());
+                        holder.sBinding.sessionCardCount.setText(dataSnapshot.child("counter").getValue().toString());
                         holder.sBinding.sessionCardTpc.setText(dataSnapshot.child("topic").getValue().toString());
 
 

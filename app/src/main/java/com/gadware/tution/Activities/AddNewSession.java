@@ -17,6 +17,7 @@ import com.gadware.tution.databinding.ActivityAddNewSessionBinding;
 import com.gadware.tution.models.SessionInfo;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -33,8 +34,9 @@ public class AddNewSession extends AppCompatActivity {
 
     ActivityAddNewSessionBinding binding;
     private final Calendar myCalendar = Calendar.getInstance();
-    private String id,  date,  day,  time, etime,  topic,  counter;
-    private String userId,tuitionid;
+    private String id,  date,  day,  time, etime,  topic;
+    int counter;
+    private String userId,tuitionid,completedDays;
     private DatabaseReference tuitionRef,sessionRef;
 
 
@@ -44,6 +46,8 @@ public class AddNewSession extends AppCompatActivity {
         setContentView(R.layout.activity_add_new_session);
 
         tuitionid=getIntent().getExtras().get("Tuition_id").toString();
+        completedDays=getIntent().getExtras().get("completedDays").toString();
+        counter = Integer.parseInt(completedDays)+1;
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
         Calendar now = Calendar.getInstance();
@@ -59,7 +63,7 @@ public class AddNewSession extends AppCompatActivity {
         Calendar cend=Calendar.getInstance();
         cend.setTimeInMillis(integerRepresentation+3600000);
 
-
+        userId= FirebaseAuth.getInstance().getUid();
 
         String myTimeFormat = "hh.mm a";
         SimpleDateFormat stf = new SimpleDateFormat(myTimeFormat, Locale.US);
@@ -71,7 +75,6 @@ public class AddNewSession extends AppCompatActivity {
         binding.inputSTime.setText(stf.format(now.getTime()));
         binding.inputETime.setText(stf.format(cend.getTime()));
         binding.inputDay.setText(GetDAY(today));
-
 
 
 
@@ -120,32 +123,32 @@ public class AddNewSession extends AppCompatActivity {
     }
 
     private void InsertNewSession() {
-        tuitionRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid);
-        tuitionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                long cc=snapshot.getChildrenCount();
-                cc++;
-                counter=String.valueOf(cc);
-                DatabaseReference sessnRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
-                id=sessnRef.getKey();
-
-                SessionInfo sessionInfo=new SessionInfo(id,date,day,time,etime,topic,counter);
-                sessnRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
-                    DatabaseReference cntRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(userId).child(tuitionid).getRef();
-                    cntRef.child("completedDays").setValue(counter);
-                    Toast.makeText(AddNewSession.this, "Added Successfully", Toast.LENGTH_SHORT).show();
-                    Intent intent =new Intent(AddNewSession.this,TuitionDetails.class);
-                    intent.putExtra("Tuition_id",tuitionid);
-                    startActivity(intent);
-                }).addOnFailureListener(e -> Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show());
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
-        });
+//        tuitionRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid);
+//        tuitionRef.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                long cc=snapshot.getChildrenCount();
+//                cc++;
+//                counter=String.valueOf(cc);
+//
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//
+//            }
+//        });
+        DatabaseReference sessnRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
+        id=sessnRef.getKey();
+        SessionInfo sessionInfo=new SessionInfo(id,date,day,time,etime,topic,String.valueOf(counter));
+        sessnRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
+            DatabaseReference cntRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(userId).child(tuitionid).getRef();
+            cntRef.child("completedDays").setValue(counter);
+            Toast.makeText(AddNewSession.this, "Added Successfully", Toast.LENGTH_SHORT).show();
+            Intent intent =new Intent(AddNewSession.this,TuitionDetails.class);
+            intent.putExtra("Tuition_id",tuitionid);
+            startActivity(intent);
+        }).addOnFailureListener(e -> Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show());
 
 
     }
