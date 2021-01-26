@@ -143,7 +143,7 @@ public class AddNewSession extends AppCompatActivity {
         SessionInfo sessionInfo=new SessionInfo(id,date,day,time,etime,topic,String.valueOf(counter));
         sessnRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
             DatabaseReference cntRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(userId).child(tuitionid).getRef();
-            cntRef.child("completedDays").setValue(counter);
+            cntRef.child("completedDays").setValue(String.valueOf(counter));
             Toast.makeText(AddNewSession.this, "Added Successfully", Toast.LENGTH_SHORT).show();
             Intent intent =new Intent(AddNewSession.this,TuitionDetails.class);
             intent.putExtra("Tuition_id",tuitionid);

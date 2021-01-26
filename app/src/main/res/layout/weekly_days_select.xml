@@ -20,7 +20,10 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Select Days"
+        android:text="Select Schedule"
+        android:padding="5dp"
+        android:textColor="@color/white"
+        android:textStyle="italic|bold"
         android:textAlignment="center"
         android:textSize="18sp" />
 
@@ -40,6 +43,7 @@
             android:text="Saturday" />
 
         <EditText
+            android:hint="00.00 am"
             android:id="@+id/satTimeET"
             android:layout_width="150dp"
             android:layout_height="match_parent"
@@ -64,6 +68,7 @@
             android:text="Sunday" />
 
         <EditText
+            android:hint="00.00 am"
             android:id="@+id/sunTimeET"
             android:layout_width="150dp"
             android:layout_height="match_parent"
@@ -88,6 +93,7 @@
             android:text="Monday" />
 
         <EditText
+            android:hint="00.00 am"
             android:id="@+id/monTimeET"
             android:layout_width="150dp"
             android:layout_height="match_parent"
@@ -112,6 +118,7 @@
             android:text="Tuesday" />
 
         <EditText
+            android:hint="00.00 am"
             android:id="@+id/tueTimeET"
             android:layout_width="150dp"
             android:layout_height="match_parent"
@@ -136,6 +143,7 @@
             android:text="Wednesday" />
 
         <EditText
+            android:hint="00.00 am"
             android:id="@+id/wedTimeET"
             android:layout_width="150dp"
             android:layout_height="match_parent"
@@ -160,6 +168,7 @@
             android:text="Thursday" />
 
         <EditText
+            android:hint="00.00 am"
             android:id="@+id/thuTimeET"
             android:layout_width="150dp"
             android:layout_height="match_parent"
@@ -184,6 +193,7 @@
             android:text="Friday" />
 
         <EditText
+            android:hint="00.00 am"
             android:id="@+id/friTimeET"
             android:layout_width="150dp"
             android:layout_height="match_parent"
@@ -192,5 +202,12 @@
 
     </LinearLayout>
 
-
+<Button
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Confirm"
+    android:textAllCaps="false"
+    android:textColor="@color/white"
+    android:id="@+id/confirm_schedule_btn"
+    android:layout_margin="10dp"/>
 </LinearLayout>

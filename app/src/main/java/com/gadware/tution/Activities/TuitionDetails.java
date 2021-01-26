@@ -84,15 +84,15 @@ public class TuitionDetails extends AppCompatActivity {
             builder.show();
         });
 
-        binding.tuitionDDSpin.setOnClickListener((View.OnClickListener) v -> {
+        binding.tuitionDDSpin.setOnClickListener(v -> {
             AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TuitionDetails.this);
 // ...Irrelevant code for customizing the buttons and title
             LayoutInflater inflater = TuitionDetails.this.getLayoutInflater();
             View dialogView = inflater.inflate(R.layout.weekly_days_select, null);
             dialogBuilder.setView(dialogView);
 
-            EditText satEt = (EditText) dialogView.findViewById(R.id.satTimeET);
-            CheckBox satCB = (CheckBox) dialogView.findViewById(R.id.satcheckBox);
+            EditText satEt =  dialogView.findViewById(R.id.satTimeET);
+            CheckBox satCB =  dialogView.findViewById(R.id.satcheckBox);
 
             AlertDialog alertDialog = dialogBuilder.create();
             alertDialog.show();

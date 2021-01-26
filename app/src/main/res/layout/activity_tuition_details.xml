@@ -112,7 +112,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight=".7"
                         android:padding="3dp"
-                        android:text="00.00" />
+                        android:text="00/00/0000" />
 
                     <TextView
                         android:layout_width="0dp"
@@ -127,7 +127,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight=".7"
                         android:padding="3dp"
-                        android:text="00.00" />
+                        android:text="00/00/0000" />
                     <TextView
                         android:id="@+id/tuitionDLocation"
                         android:layout_width="0dp"
