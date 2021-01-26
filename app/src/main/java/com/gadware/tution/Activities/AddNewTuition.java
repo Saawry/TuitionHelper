@@ -78,7 +78,7 @@ public class AddNewTuition extends AppCompatActivity {
         CheckBox thuCB = dialogView.findViewById(R.id.thucheckBox);
         CheckBox friCB = dialogView.findViewById(R.id.fricheckBox);
 
-        Button confirmBtn = findViewById(R.id.confirm_schedule_btn);
+        Button confirmBtn = dialogView.findViewById(R.id.confirm_schedule_btn);
 
         satCB.setOnCheckedChangeListener((buttonView, isChecked) -> {
             HideViewEditText(satEt, isChecked);
