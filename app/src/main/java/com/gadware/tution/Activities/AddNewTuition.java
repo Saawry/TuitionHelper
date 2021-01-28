@@ -168,8 +168,8 @@ public class AddNewTuition extends AppCompatActivity {
         id = TuitionRef.getKey();
         TuitionInfo tuitionInfo = new TuitionInfo(id, studentName, location, mobile, totalDays, completedDays, weeklyDays, remuneration, "Active");
         TuitionRef.setValue(tuitionInfo).addOnSuccessListener(aVoid -> {
-            UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mUserId).child("TuitionList").child(id);
-            UserRef.setValue("Active");
+//            UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mUserId).child("TuitionList").child(id);
+//            UserRef.setValue("Active");
             AddSchedules(id);
 
         }).addOnFailureListener(e -> Toast.makeText(AddNewTuition.this, e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -228,7 +228,6 @@ public class AddNewTuition extends AppCompatActivity {
         }
 
 
-        //weeklyDays=binding.inputWeeklyDays.getText().toString();
         weeklyDays = String.valueOf(daySchedules.size());
         if (weeklyDays.isEmpty() || weeklyDays.length() < 1) {
             binding.inputWeeklyDays.setError("enter weekly days");

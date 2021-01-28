@@ -6,9 +6,13 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -27,12 +31,16 @@ import com.gadware.tution.databinding.ActivityTuitionDetailsBinding;
 import com.gadware.tution.databinding.SessionCardBinding;
 import com.gadware.tution.models.DaySchedule;
 import com.gadware.tution.models.SessionInfo;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -44,11 +52,25 @@ import java.util.Objects;
 public class TuitionDetails extends AppCompatActivity {
     private AlertDialog alertDialog;
     ActivityTuitionDetailsBinding binding;
+
+
+    StorageReference Storageref;
+    DatabaseReference tuitionInfoRef;
+    private static final int PERMISSION_ALL = 222;
+    private static final String[] PERMISSIONS = {
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+    };
+
+    private static final int PICK_IMAGE = 100;
+    Uri imageUri;
+
+
     private final Calendar myCalendar = Calendar.getInstance();
     private DatabaseReference tuitionRef, sessionRef;
     private String  mUserId, cTuitionId,completedDays;
-    List<DaySchedule> NewDaySchedule = new ArrayList<>();
+
     List<DaySchedule> Schedule= new ArrayList<>();
+    List<DaySchedule> NewDaySchedule= new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +84,10 @@ public class TuitionDetails extends AppCompatActivity {
         RetriveScheduleInfo();
         RetriveSessionInfoList();
 
+        Storageref = FirebaseStorage.getInstance().getReference("Images");
+        tuitionInfoRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId);
+
+
         Calendar now = Calendar.getInstance();
         int yr = now.get(Calendar.YEAR);
         int mnth = now.get(Calendar.MONTH) ; // Note: result may zero based!(+1)
@@ -74,6 +100,22 @@ public class TuitionDetails extends AppCompatActivity {
             nSession.putExtra("completedDays", completedDays);
             startActivity(nSession);
         });
+
+        binding.tuitionDImg.setOnClickListener(v -> {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(PERMISSIONS, PERMISSION_ALL);
+                } else {
+                    openGallery();
+                }
+            } else {
+                openGallery();
+            }
+        });
+
+
+
+
 
         binding.tuitionDSDate.setOnClickListener(v -> {
             DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
@@ -134,7 +176,7 @@ public class TuitionDetails extends AppCompatActivity {
         });
 
         binding.tuitionDDSpin.setOnClickListener(v -> {
-
+            RetriveScheduleInfo();
             getWeeklySchedule();
 
 
@@ -246,45 +288,46 @@ public class TuitionDetails extends AppCompatActivity {
         });
 
         confirmBtn.setOnClickListener(v -> {
+            NewDaySchedule.clear();
             if (satCB.isChecked()) {
                 String time = satEt.getText().toString();
-                if (!TextUtils.isEmpty(time) && time.length() > 6) {
+                if (!TextUtils.isEmpty(time) && time.length() > 5) {
                     NewDaySchedule.add(new DaySchedule("SAT", time));
                 }
             }
             if (sunCB.isChecked()) {
                 String time = sunEt.getText().toString();
-                if (!TextUtils.isEmpty(time) && time.length() > 6) {
+                if (!TextUtils.isEmpty(time) && time.length() > 5) {
                     NewDaySchedule.add(new DaySchedule("SUN", time));
                 }
             }
             if (monCB.isChecked()) {
                 String time = monEt.getText().toString();
-                if (!TextUtils.isEmpty(time) && time.length() > 6) {
+                if (!TextUtils.isEmpty(time) && time.length() > 5) {
                     NewDaySchedule.add(new DaySchedule("MON", time));
                 }
             }
             if (tueCB.isChecked()) {
                 String time = tueEt.getText().toString();
-                if (!TextUtils.isEmpty(time) && time.length() > 6) {
+                if (!TextUtils.isEmpty(time) && time.length() > 5) {
                     NewDaySchedule.add(new DaySchedule("TUE", time));
                 }
             }
             if (wedCB.isChecked()) {
                 String time = wedEt.getText().toString();
-                if (!TextUtils.isEmpty(time) && time.length() > 6) {
+                if (!TextUtils.isEmpty(time) && time.length() > 5) {
                     NewDaySchedule.add(new DaySchedule("WED", time));
                 }
             }
             if (thuCB.isChecked()) {
                 String time = thuEt.getText().toString();
-                if (!TextUtils.isEmpty(time) && time.length() > 6) {
+                if (!TextUtils.isEmpty(time) && time.length() > 5) {
                     NewDaySchedule.add(new DaySchedule("THU", time));
                 }
             }
             if (friCB.isChecked()) {
                 String time = friEt.getText().toString();
-                if (!TextUtils.isEmpty(time) && time.length() > 6) {
+                if (!TextUtils.isEmpty(time) && time.length() > 5) {
                     NewDaySchedule.add(new DaySchedule("FRI", time));
                 }
             }
@@ -311,12 +354,12 @@ public class TuitionDetails extends AppCompatActivity {
 
     private void AddSchedules(String id) {
         binding.tuitionDDSpin.setText("");
-        FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId).child(id).child("weeklyDays").setValue(NewDaySchedule.size());
+        FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId).child(id).child("weeklyDays").setValue(String.valueOf(NewDaySchedule.size()));
+        FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id).removeValue();
         for (DaySchedule daySchedule:NewDaySchedule){
+            binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" "+daySchedule.getDayName());
             DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id);
             ScheduleRef.child(daySchedule.getDayName()).setValue(daySchedule.getTime());
-
-            binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText().toString()+" "+daySchedule.getDayName());
         }
 
     }
@@ -326,7 +369,7 @@ public class TuitionDetails extends AppCompatActivity {
         scheduleRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
+                Schedule.clear();
                 binding.tuitionDDSpin.setText("");
                 if (snapshot.child("SAT").exists()){
                     String Time= Objects.requireNonNull(snapshot.child("SAT").getValue()).toString();
@@ -486,5 +529,64 @@ public class TuitionDetails extends AppCompatActivity {
         adapter.startListening();
 
     }
+
+
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @androidx.annotation.NonNull String[] permissions, @androidx.annotation.NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == PERMISSION_ALL) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                openGallery();
+            } else {
+                Toast.makeText(this, "permission Denied...!!", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    private void openGallery() {
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        pickIntent.setType("image/*");
+
+        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
+
+        startActivityForResult(chooserIntent, PICK_IMAGE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
+            imageUri = data.getData();
+            binding.tuitionDImg.setImageURI(imageUri);
+            UploadImage(imageUri);
+        }
+    }
+
+    private void UploadImage(Uri imageUri) {
+
+        final StorageReference ref = Storageref.child(cTuitionId + ".jpg");
+        UploadTask uploadTask = ref.putFile(imageUri);
+
+        uploadTask.continueWithTask(task -> {
+            if (!task.isSuccessful()) {
+                throw task.getException();
+            }
+            return ref.getDownloadUrl();
+        }).addOnCompleteListener((OnCompleteListener<Uri>) task -> {
+            if (task.isSuccessful()) {
+                Uri downloadUri = task.getResult();
+                assert downloadUri != null;
+                tuitionInfoRef.child("ImageUri").setValue(downloadUri.toString());
+            }
+        });
+    }
+
+
 }
 

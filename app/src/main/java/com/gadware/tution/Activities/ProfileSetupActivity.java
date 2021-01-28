@@ -60,7 +60,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         FirebaseUser mmuser = mAuth.getCurrentUser();
                         assert mmuser != null;
                         uid = mmuser.getUid();
-                        User user = new User(uid, email, password, address, mobile, name, "noImage");
+                        User user = new User(uid, email, password, address, mobile, name);
                         userRef = FirebaseDatabase.getInstance().getReference("Users").getRef();
                         userRef.child(uid).child("UserInfo").setValue(user).addOnSuccessListener(aVoid -> {
                             Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();

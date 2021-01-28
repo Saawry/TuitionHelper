@@ -23,7 +23,7 @@
                 android:padding="5dp"
                 app:cardCornerRadius="45dp">
 
-                <ImageView
+                <View
                     android:id="@+id/ProfileIcon"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -42,7 +42,7 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
-                    <TextView
+                    <View
                         android:id="@+id/tuitionCardTitle"
                         android:layout_width="0dp"
                         android:layout_weight="1"
@@ -51,7 +51,7 @@
                         android:text="Tuition Title"
                         android:textSize="20dp" />
 
-                    <TextView
+                    <View
                         android:id="@+id/tuitionCardLocation"
                         android:layout_width="0dp"
                         android:layout_weight="1"
@@ -67,7 +67,7 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
-                    <TextView
+                    <View
                         android:id="@+id/tuitionCardDays"
                         android:layout_width="0dp"
                         android:layout_weight="1"
@@ -77,7 +77,7 @@
                         android:textAlignment="center"
                         android:textSize="16dp" />
 
-                    <TextView
+                    <View
                         android:id="@+id/tuitionCardWeekly"
                         android:layout_width="0dp"
                         android:layout_weight="1"

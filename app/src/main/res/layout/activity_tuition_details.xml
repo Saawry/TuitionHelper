@@ -76,20 +76,20 @@
                         android:id="@+id/tuitionDMobile"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight=".8"
                         android:padding="5dp"
                         android:text="01000000000"
-                        android:textSize="17dp" />
+                        android:textSize="16dp" />
 
                     <TextView
                         android:id="@+id/tuitionDDSpin"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
+                        android:layout_weight="1.2"
                         android:padding="5dp"
                         android:text="Sat,Sun,Mon"
                         android:textAlignment="center"
-                        android:textSize="16dp" />
+                        android:textSize="15dp" />
                 </LinearLayout>
 
                 <LinearLayout
