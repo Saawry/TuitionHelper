@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
-
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -104,39 +103,38 @@
                             android:inputType="number" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp">
 
-                    <!-- mobile number -->
-
-
-                    <!-- Password Label -->
-                    <com.google.android.material.textfield.TextInputLayout
+                    <EditText
+                        android:id="@+id/input_Remuneration"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginBottom="3dp">
+                        android:hint="Remuneration"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <EditText
-                            android:id="@+id/input_WeeklyDays"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Weekly Days"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
 
-                    <!-- Password Re-enter Label -->
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginBottom="3dp">
+                <TextView
+                    android:padding="10dp"
+                    android:id="@+id/input_WeeklyDays"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Weekly Days"
+                    android:textAlignment="center"
+                    android:textSize="18sp"
+                    android:layout_marginTop="5dp"
+                    android:textColor="@color/white"
+                    />
+                <View
+                    android:background="@color/white"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"/>
 
-                        <EditText
-                            android:id="@+id/input_Remuneration"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Remuneration"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
+
 
                     <Button
                         android:id="@+id/addTuitionBtnId"

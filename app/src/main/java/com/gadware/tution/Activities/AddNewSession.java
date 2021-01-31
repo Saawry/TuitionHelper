@@ -37,7 +37,6 @@ public class AddNewSession extends AppCompatActivity {
     private String id,  date,  day,  time, etime,  topic;
     int counter;
     private String userId,tuitionid,completedDays;
-    private DatabaseReference tuitionRef,sessionRef;
 
 
     @Override

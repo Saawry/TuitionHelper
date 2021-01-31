@@ -6,11 +6,13 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -33,13 +35,13 @@ import java.util.Objects;
 public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
-
+    private AlertDialog alertDialog;
 
     private FirebaseDatabase firedb;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private DatabaseReference tuitionRef;
-    private String status = "",mUserId;
+    private String status = "", mUserId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,10 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        firedb=FirebaseDatabase.getInstance();
-        mUserId=mUser.getUid();
+        firedb = FirebaseDatabase.getInstance();
+        mUserId = mUser.getUid();
         VerifyUserExistence();
-
+        Showialog();
         binding.tuitionRecycler.setLayoutManager(new LinearLayoutManager(this));
 
 
@@ -68,25 +70,34 @@ public class MainActivity extends AppCompatActivity {
         );
 
 
-
-        tuitionRef=FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
+        tuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
         //tuitionInfoRef=FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
-       tuitionRef.addValueEventListener(new ValueEventListener() {
-           @Override
-           public void onDataChange(@NonNull DataSnapshot snapshot) {
-               if (snapshot.hasChildren()){
-                   RetriveTuitionInfoList();
-               }
-           }
+        tuitionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.hasChildren()) {
+                    RetriveTuitionInfoList();
+                }
+            }
 
-           @Override
-           public void onCancelled(@NonNull DatabaseError error) {
-               Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-           }
-       });
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
 
+    }
 
+    private void Showialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(MainActivity.this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = MainActivity.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
+        dialogBuilder.setView(dialogView);
+        alertDialog = dialogBuilder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
     }
 
     private void RetriveTuitionInfoList() {
@@ -102,19 +113,19 @@ public class MainActivity extends AppCompatActivity {
                 tuitionRef.child(TuitionIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-
-                        if (dataSnapshot.hasChild("ImageUri")){
+                        alertDialog.dismiss();
+                        if (dataSnapshot.hasChild("ImageUri")) {
                             Glide.with(MainActivity.this).load(dataSnapshot.child("ImageUri").getValue().toString()).into(holder.tBinding.ProfileIcon);
                         }
 
-                        String tDAys=dataSnapshot.child("totalDays").getValue().toString();
-                        String cDAys=dataSnapshot.child("completedDays").getValue().toString();
-                        String wDAys=dataSnapshot.child("weeklyDays").getValue().toString();
+                        String tDAys = dataSnapshot.child("totalDays").getValue().toString();
+                        String cDAys = dataSnapshot.child("completedDays").getValue().toString();
+                        String wDAys = dataSnapshot.child("weeklyDays").getValue().toString();
 
                         holder.tBinding.tuitionCardTitle.setText(dataSnapshot.child("studentName").getValue().toString());
                         holder.tBinding.tuitionCardLocation.setText(dataSnapshot.child("location").getValue().toString());
-                        holder.tBinding.tuitionCardDays.setText("Done "+cDAys+" of "+tDAys+" days");
-                        holder.tBinding.tuitionCardWeekly.setText("Weekly "+wDAys+" days");
+                        holder.tBinding.tuitionCardDays.setText("Done " + cDAys + " of " + tDAys + " days");
+                        holder.tBinding.tuitionCardWeekly.setText("Weekly " + wDAys + " days");
 
                         holder.itemView.setOnClickListener(v -> {
                             Intent tdIntent = new Intent(MainActivity.this, TuitionDetails.class);
@@ -123,12 +134,11 @@ public class MainActivity extends AppCompatActivity {
                         });
 
 
-
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-
+                        alertDialog.dismiss();
                     }
                 });
             }
@@ -185,12 +195,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class TuitionssViewHolder extends RecyclerView.ViewHolder{
+    public static class TuitionssViewHolder extends RecyclerView.ViewHolder {
 
         TuitionCardBinding tBinding;
+
         public TuitionssViewHolder(@NonNull TuitionCardBinding tBinding) {
             super(tBinding.getRoot());
-            this.tBinding=tBinding;
+            this.tBinding = tBinding;
 
         }
     }

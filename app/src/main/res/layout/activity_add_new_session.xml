@@ -28,79 +28,117 @@
             android:layout_margin="15dp"
             android:orientation="vertical"
             android:padding="10dp">
-
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/dateView"
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp">
-
-                <EditText
-                    android:id="@+id/input_Date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Date"
-                    android:inputType="date" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/timeView"
+                android:text="Date"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                />
+            <TextView
+                android:padding="10dp"
+                android:id="@+id/input_Date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp">
+                android:text="Date"
+                android:textAlignment="center"
+                android:textSize="21sp"
+                android:textColor="@color/white"
+                />
+            <View
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
 
-                <EditText
-                    android:id="@+id/input_sTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Start Time"
-                    android:inputType="time" />
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
+            <TextView
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp">
-
-                <EditText
-                    android:id="@+id/input_eTime"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="End Time"
-                    android:inputType="time" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
+                android:text="Start Time"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                />
+            <TextView
+                android:padding="10dp"
+                android:id="@+id/input_sTime"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp">
+                android:text="S Time"
+                android:textAlignment="center"
+                android:textSize="21sp"
+                android:textColor="@color/white"
+                />
+            <View
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
 
-                <EditText
-                    android:id="@+id/input_Day"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Day"
-                    android:inputType="datetime" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
+            <TextView
+                android:layout_marginTop="10dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="3dp"
-                android:layout_marginBottom="3dp">
+                android:text="End Time"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                />
+            <TextView
+                android:padding="10dp"
+                android:id="@+id/input_eTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="E Time"
+                android:textAlignment="center"
+                android:textSize="21sp"
+                android:textColor="@color/white"
+                />
+            <View
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
 
-                <EditText
-                    android:id="@+id/input_Topic"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Topic"
-                    android:inputType="text" />
-            </com.google.android.material.textfield.TextInputLayout>
+            <TextView
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Day"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                />
+            <TextView
+                android:padding="10dp"
+                android:id="@+id/input_Day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Day"
+                android:textAlignment="center"
+                android:textSize="21sp"
+                android:textColor="@color/white"
+                />
+            <View
+                android:background="@color/white"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Topic"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                />
+            <EditText
+                android:padding="10dp"
+                android:id="@+id/input_Topic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Topic"
+                android:textAlignment="center"
+                android:textSize="21sp"
+                android:textColor="@color/white"
+                />
+
 
 
             <Button

@@ -32,6 +32,7 @@ import com.gadware.tution.databinding.SessionCardBinding;
 import com.gadware.tution.models.DaySchedule;
 import com.gadware.tution.models.SessionInfo;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -80,6 +81,9 @@ public class TuitionDetails extends AppCompatActivity {
         cTuitionId = getIntent().getExtras().get("Tuition_id").toString();
         mUserId= FirebaseAuth.getInstance().getUid();
         binding.sessionRecycler.setLayoutManager(new LinearLayoutManager(this));
+
+        Showialog();
+
         RetriveTuitionInfo();
         RetriveScheduleInfo();
         RetriveSessionInfoList();
@@ -487,6 +491,7 @@ public class TuitionDetails extends AppCompatActivity {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                         //SessionInfo sessionInfo= (SessionInfo) dataSnapshot.getValue();
+                        alertDialog.dismiss();
                         String dt = dataSnapshot.child("date").getValue().toString();
                         String dy = dataSnapshot.child("day").getValue().toString();
 
@@ -495,8 +500,8 @@ public class TuitionDetails extends AppCompatActivity {
 
                         holder.sBinding.sessionCardDD.setText(dt + "   " + dy);
                         holder.sBinding.sessionCardTT.setText(t + "  to " + et);
-                        holder.sBinding.sessionCardCount.setText(dataSnapshot.child("counter").getValue().toString());
-                        holder.sBinding.sessionCardTpc.setText(dataSnapshot.child("topic").getValue().toString());
+                        holder.sBinding.sessionCardCount.setText("Session No. "+dataSnapshot.child("counter").getValue().toString());
+                        holder.sBinding.sessionCardTpc.setText("Topic: "+dataSnapshot.child("topic").getValue().toString());
 
 
 //                        holder.itemView.setOnClickListener(v -> {
@@ -564,6 +569,7 @@ public class TuitionDetails extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             imageUri = data.getData();
             binding.tuitionDImg.setImageURI(imageUri);
+            Showialog();
             UploadImage(imageUri);
         }
     }
@@ -578,15 +584,25 @@ public class TuitionDetails extends AppCompatActivity {
                 throw task.getException();
             }
             return ref.getDownloadUrl();
-        }).addOnCompleteListener((OnCompleteListener<Uri>) task -> {
+        }).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Uri downloadUri = task.getResult();
                 assert downloadUri != null;
                 tuitionInfoRef.child("ImageUri").setValue(downloadUri.toString());
+                alertDialog.dismiss();
             }
-        });
+        }).addOnFailureListener(e -> alertDialog.dismiss());
     }
 
-
+    private void Showialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TuitionDetails.this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = TuitionDetails.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
+        dialogBuilder.setView(dialogView);
+        alertDialog = dialogBuilder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+    }
 }
 

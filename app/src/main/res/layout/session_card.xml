@@ -24,23 +24,24 @@
                     android:weightSum="2">
 
                     <TextView
+                        android:textColor="@color/teal_700"
                         android:id="@+id/sessionCardDD"
                         android:layout_width="0dp"
-                        android:layout_weight="1.5"
+                        android:layout_weight="1.3"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:text="Session date day"
-                        android:textSize="21dp" />
+                        android:textSize="18dp" />
 
                     <TextView
                         android:id="@+id/sessionCardCount"
                         android:layout_width="0dp"
-                        android:layout_weight=".5"
+                        android:layout_weight=".7"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:text="Counter"
                         android:textAlignment="center"
-                        android:textSize="20dp" />
+                        android:textSize="16dp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -51,22 +52,22 @@
                     <TextView
                         android:id="@+id/sessionCardTT"
                         android:layout_width="0dp"
-                        android:layout_weight="1.2"
+                        android:layout_weight="1.1"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
+                        android:textColor="@color/teal_700"
                         android:text="00.00 am to 00.00am"
-                        android:textAlignment="center"
-                        android:textSize="20dp" />
+                        android:textSize="18dp" />
 
                     <TextView
                         android:id="@+id/sessionCardTpc"
                         android:layout_width="0dp"
-                        android:layout_weight=".8"
+                        android:layout_weight=".9"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:text="Topic"
                         android:textAlignment="center"
-                        android:textSize="20dp" />
+                        android:textSize="18dp" />
                 </LinearLayout>
             </LinearLayout>
     </androidx.cardview.widget.CardView>

@@ -25,6 +25,8 @@
 
                 <View
                     android:id="@+id/ProfileIcon"
+                    android:layout_margin="5dp"
+                    android:background="@color/iron"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:src="@drawable/ic_baseline_account_circle_24" />
@@ -43,23 +45,23 @@
                     android:weightSum="2">
 
                     <View
+                        android:background="@color/iron"
+                        android:layout_margin="5dp"
                         android:id="@+id/tuitionCardTitle"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
+                        android:layout_height="25dp"
                         android:padding="5dp"
-                        android:text="Tuition Title"
-                        android:textSize="20dp" />
+                        />
 
                     <View
+                        android:background="@color/iron"
+                        android:layout_margin="5dp"
                         android:id="@+id/tuitionCardLocation"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="Location"
-                        android:textAlignment="center"
-                        android:textSize="16dp" />
+                        android:layout_height="25dp"
+                        android:padding="5dp" />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -68,20 +70,21 @@
                     android:weightSum="2">
 
                     <View
+                        android:background="@color/iron"
+                        android:layout_margin="5dp"
                         android:id="@+id/tuitionCardDays"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
-                        android:padding="5dp"
-                        android:text="0 of 0 days"
-                        android:textAlignment="center"
-                        android:textSize="16dp" />
+                        android:layout_height="25dp"
+                        android:padding="5dp" />
 
                     <View
+                        android:background="@color/iron"
+                        android:layout_margin="5dp"
                         android:id="@+id/tuitionCardWeekly"
                         android:layout_width="0dp"
                         android:layout_weight="1"
-                        android:layout_height="wrap_content"
+                        android:layout_height="25dp"
                         android:padding="5dp"
                         android:text="weekly 0 days"
                         android:textAlignment="center"

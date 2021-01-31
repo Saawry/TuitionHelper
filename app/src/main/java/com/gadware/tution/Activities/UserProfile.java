@@ -6,11 +6,13 @@ import androidx.databinding.DataBindingUtil;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Toast;
 
@@ -38,7 +40,7 @@ import java.util.Objects;
 public class UserProfile extends AppCompatActivity {
 
     ActivityUserProfileBinding binding;
-
+    private AlertDialog alertDialog;
     StorageReference Storageref;
     DatabaseReference userInfoRef;
     String muserId, newImageUrl;
@@ -59,6 +61,7 @@ public class UserProfile extends AppCompatActivity {
         muserId = FirebaseAuth.getInstance().getUid();
         Storageref = FirebaseStorage.getInstance().getReference("Images");
         userInfoRef = FirebaseDatabase.getInstance().getReference("Users").child(muserId).child("UserInfo");
+        Showialog();
         RetrieveUserInfo();
         binding.userImageIV.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -84,6 +87,7 @@ public class UserProfile extends AppCompatActivity {
         userInfoRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
+                alertDialog.dismiss();
                 if (snapshot.child("ImageUri").exists()) {
 
                     Glide.with(UserProfile.this).load(Objects.requireNonNull(snapshot.child("ImageUri").getValue()).toString()).into(binding.userImageIV);
@@ -95,7 +99,7 @@ public class UserProfile extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                alertDialog.dismiss();
             }
         });
     }
@@ -132,13 +136,14 @@ public class UserProfile extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             imageUri = data.getData();
             binding.userImageIV.setImageURI(imageUri);
+            alertDialog.show();
             UploadImage(imageUri);
         }
     }
 
     private void UploadImage(Uri imageUri) {
 
-        final StorageReference ref = Storageref.child(muserId+".jpg");
+        final StorageReference ref = Storageref.child(muserId + ".jpg");
         UploadTask uploadTask = ref.putFile(imageUri);
 
         uploadTask.continueWithTask(task -> {
@@ -146,15 +151,16 @@ public class UserProfile extends AppCompatActivity {
                 throw task.getException();
             }
             return ref.getDownloadUrl();
-        }).addOnCompleteListener((OnCompleteListener<Uri>) task -> {
+        }).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Uri downloadUri = task.getResult();
                 assert downloadUri != null;
                 userInfoRef.child("ImageUri").setValue(downloadUri.toString());
+                alertDialog.dismiss();
             }
+        }).addOnFailureListener(e -> {
+            alertDialog.dismiss();
         });
-
-
 
 
 //        Storageref.child(muserId+".jpg").putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
@@ -166,5 +172,15 @@ public class UserProfile extends AppCompatActivity {
 //        ).addOnFailureListener(e -> Toast.makeText(UserProfile.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
+    private void Showialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(UserProfile.this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = UserProfile.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
+        dialogBuilder.setView(dialogView);
+        alertDialog = dialogBuilder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+    }
 
 }
