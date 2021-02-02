@@ -31,8 +31,6 @@ import com.gadware.tution.databinding.ActivityTuitionDetailsBinding;
 import com.gadware.tution.databinding.SessionCardBinding;
 import com.gadware.tution.models.DaySchedule;
 import com.gadware.tution.models.SessionInfo;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -82,7 +80,7 @@ public class TuitionDetails extends AppCompatActivity {
         mUserId= FirebaseAuth.getInstance().getUid();
         binding.sessionRecycler.setLayoutManager(new LinearLayoutManager(this));
 
-        Showialog();
+        ShowDialog();
 
         RetriveTuitionInfo();
         RetriveScheduleInfo();
@@ -123,9 +121,9 @@ public class TuitionDetails extends AppCompatActivity {
 
         binding.tuitionDSDate.setOnClickListener(v -> {
             DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
-                myCalendar.set(Calendar.YEAR, yr);
-                myCalendar.set(Calendar.MONTH, mnth);
-                myCalendar.set(Calendar.DAY_OF_MONTH, day);
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, month);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
 
                 binding.tuitionDSDate.setText(sdf.format(myCalendar.getTime()));
@@ -155,10 +153,9 @@ public class TuitionDetails extends AppCompatActivity {
 
         binding.tuitionDEDate.setOnClickListener(v -> {
             DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
-                myCalendar.set(Calendar.YEAR, yr);
-                myCalendar.set(Calendar.MONTH, mnth);
-                myCalendar.set(Calendar.DAY_OF_MONTH, day);
-
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, month);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
                 binding.tuitionDEDate.setText(sdf.format(myCalendar.getTime()));
                 DatabaseReference sDtRef=FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId).child("eDate");
@@ -569,7 +566,7 @@ public class TuitionDetails extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             imageUri = data.getData();
             binding.tuitionDImg.setImageURI(imageUri);
-            Showialog();
+            ShowDialog();
             UploadImage(imageUri);
         }
     }
@@ -594,7 +591,7 @@ public class TuitionDetails extends AppCompatActivity {
         }).addOnFailureListener(e -> alertDialog.dismiss());
     }
 
-    private void Showialog() {
+    private void ShowDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TuitionDetails.this);
 // ...Irrelevant code for customizing the buttons and title
         LayoutInflater inflater = TuitionDetails.this.getLayoutInflater();

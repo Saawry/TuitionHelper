@@ -5,6 +5,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -76,13 +77,12 @@ public class AddNewSession extends AppCompatActivity {
         binding.inputDay.setText(GetDAY(today));
 
 
-
         binding.inputDate.setOnClickListener(v -> {
-
+            //date.show();
             DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
-                myCalendar.set(Calendar.YEAR, yr);
-                myCalendar.set(Calendar.MONTH, mnth);
-                myCalendar.set(Calendar.DAY_OF_MONTH, day);
+                myCalendar.set(Calendar.YEAR, year);
+                myCalendar.set(Calendar.MONTH, month);
+                myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
 
                 binding.inputDate.setText(sdf.format(myCalendar.getTime()));
@@ -93,11 +93,11 @@ public class AddNewSession extends AppCompatActivity {
         binding.inputSTime.setOnClickListener(v -> {
 
             TimePickerDialog nTime = new TimePickerDialog(this, R.style.datepicker, (view, hourOfDay, minute) -> {
-                myCalendar.set(Calendar.HOUR_OF_DAY, hour);
-                myCalendar.set(Calendar.MINUTE, minte);
+                myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                myCalendar.set(Calendar.MINUTE, minute);
 
 
-                binding.inputSTime.setText(sdf.format(myCalendar.getTime()));
+                binding.inputSTime.setText(stf.format(myCalendar.getTime()));
             }, hour, minte, false);
             nTime.show();
         });
@@ -105,10 +105,10 @@ public class AddNewSession extends AppCompatActivity {
         binding.inputETime.setOnClickListener(v -> {
 
             TimePickerDialog nTime = new TimePickerDialog(this, R.style.datepicker, (view, hourOfDay, minute) -> {
-                myCalendar.set(Calendar.HOUR_OF_DAY, ehour);
-                myCalendar.set(Calendar.MINUTE, minte);
+                myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                myCalendar.set(Calendar.MINUTE, minute);
 
-                binding.inputETime.setText(sdf.format(myCalendar.getTime()));
+                binding.inputETime.setText(stf.format(myCalendar.getTime()));
             }, ehour, minte, false);
             nTime.show();
         });
