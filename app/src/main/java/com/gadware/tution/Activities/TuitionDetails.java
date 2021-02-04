@@ -31,6 +31,14 @@ import com.gadware.tution.databinding.ActivityTuitionDetailsBinding;
 import com.gadware.tution.databinding.SessionCardBinding;
 import com.gadware.tution.models.DaySchedule;
 import com.gadware.tution.models.SessionInfo;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -81,10 +89,55 @@ public class TuitionDetails extends AppCompatActivity {
         binding.sessionRecycler.setLayoutManager(new LinearLayoutManager(this));
 
         ShowDialog();
-
         RetriveTuitionInfo();
         RetriveScheduleInfo();
         RetriveSessionInfoList();
+
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        //adView.setAdUnitId("ca-app-pub-7098600576446460/4992449955");
+
+        MobileAds.initialize(this, initializationStatus -> {
+
+        });
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        binding.adView.loadAd(adRequest);
+
+        binding.adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdLeftApplication() {
+                // Code to be executed when the user has left the app.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
 
         Storageref = FirebaseStorage.getInstance().getReference("Images");
         tuitionInfoRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId);
@@ -593,7 +646,6 @@ public class TuitionDetails extends AppCompatActivity {
 
     private void ShowDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TuitionDetails.this);
-// ...Irrelevant code for customizing the buttons and title
         LayoutInflater inflater = TuitionDetails.this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
         dialogBuilder.setView(dialogView);

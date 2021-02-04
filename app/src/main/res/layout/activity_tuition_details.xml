@@ -3,13 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context=".Activities.TuitionDetails">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/details_cardv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="5dp"
@@ -50,7 +51,6 @@
                         android:layout_weight="1.2"
                         android:padding="5dp"
                         android:text="Student Name"
-
                         android:textSize="19dp" />
 
                     <TextView
@@ -178,6 +178,7 @@
         </androidx.cardview.widget.CardView>
 
         <Button
+            android:layout_below="@+id/details_cardv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="25dp"
@@ -190,6 +191,8 @@
             android:id="@+id/tuitionDAdnSsn"/>
 
         <androidx.recyclerview.widget.RecyclerView
+            android:layout_above="@+id/adView"
+            android:layout_below="@+id/tuitionDAdnSsn"
             android:id="@+id/sessionRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -198,5 +201,23 @@
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             tools:listitem="@layout/session_card" />
-    </LinearLayout>
+
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+<!--            ads:adUnitId="ca-app-pub-7098600576446460/4992449955">-->
+        </com.google.android.gms.ads.AdView>
+
+    </RelativeLayout>
 </layout>
+
+<!--    android:layout_width="300dp"-->
+<!--    android:layout_height="50dp"-->

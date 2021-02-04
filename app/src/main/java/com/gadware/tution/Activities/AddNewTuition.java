@@ -31,7 +31,7 @@ public class AddNewTuition extends AppCompatActivity {
     ActivityAddNewTuitionBinding binding;
     private String id, studentName, location, mobile, totalDays, completedDays, weeklyDays, remuneration;
     private AlertDialog alertDialog;
-    private DatabaseReference  TuitionRef;
+    private DatabaseReference TuitionRef;
     private String mUserId;
 
     List<DaySchedule> daySchedules = new ArrayList<>();
