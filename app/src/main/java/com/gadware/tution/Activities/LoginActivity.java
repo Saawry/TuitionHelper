@@ -1,7 +1,10 @@
 package com.gadware.tution.Activities;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +20,7 @@ public class LoginActivity extends AppCompatActivity {
     ActivityLoginBinding binding;
     private String email, pass;
     private FirebaseAuth mAuth;
+    private AlertDialog alertDialog;
 
 
     @Override
@@ -46,14 +50,16 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void SignInUser() {
-
+        Showialog();
         mAuth.signInWithEmailAndPassword(email, pass)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
+                        alertDialog.dismiss();
                         startActivity(new Intent(this, MainActivity.class));
                         finish();
                     }
                 }).addOnFailureListener(e -> {
+                    alertDialog.dismiss();
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
@@ -79,5 +85,14 @@ public class LoginActivity extends AppCompatActivity {
 
         return valid;
     }
-
+    private void Showialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(LoginActivity.this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = LoginActivity.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
+        dialogBuilder.setView(dialogView);
+        alertDialog = dialogBuilder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+    }
 }

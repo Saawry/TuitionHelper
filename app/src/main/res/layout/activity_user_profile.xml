@@ -4,31 +4,74 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
+        android:gravity="center"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".Activities.UserProfile">
-<androidx.cardview.widget.CardView
-    android:id="@+id/image_card"
-    android:layout_centerHorizontal="true"
-    android:layout_marginTop="35dp"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    app:cardCornerRadius="150dp">
-    <ImageView
-        android:id="@+id/userImageIV"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:src="@color/white" />
-</androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/image_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="35dp"
+            app:cardCornerRadius="170dp">
+
+            <ImageView
+                android:id="@+id/userImageIV"
+                android:layout_width="170dp"
+                android:layout_height="170dp"
+                android:src="@color/white" />
+        </androidx.cardview.widget.CardView>
 
 
-        <Button
-            android:layout_marginTop="150dp"
-            android:id="@+id/signoutBtn"
+        <TextView
+            android:id="@+id/input_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/image_card"
-            android:text="Sign Out" />
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="5dp"
+            android:padding="5dp" />
+
+        <TextView
+            android:id="@+id/input_mobile"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/input_name"
+            android:layout_marginBottom="5dp"
+            android:padding="5dp" />
+
+        <TextView
+            android:layout_marginBottom="5dp"
+            android:padding="5dp"
+            android:id="@+id/input_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/input_mobile" />
+
+        <TextView
+            android:layout_marginBottom="5dp"
+            android:padding="5dp"
+            android:id="@+id/input_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/input_address" />
+
+
+        <Button
+            android:id="@+id/signoutBtn"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_below="@id/input_email"
+            android:layout_marginTop="25dp"
+            android:layout_marginEnd="15dp"
+            android:layout_marginStart="15dp"
+            android:background="@drawable/btn_background_round"
+            android:text="Sign Out"
+            android:textColor="@color/white" />
     </RelativeLayout>
 
 

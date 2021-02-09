@@ -3,6 +3,7 @@ package com.gadware.tution.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,6 +40,8 @@ import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -62,7 +65,7 @@ public class TuitionDetails extends AppCompatActivity {
 
 
     StorageReference Storageref;
-    DatabaseReference tuitionInfoRef;
+
     private static final int PERMISSION_ALL = 222;
     private static final String[] PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -73,7 +76,7 @@ public class TuitionDetails extends AppCompatActivity {
 
 
     private final Calendar myCalendar = Calendar.getInstance();
-    private DatabaseReference tuitionRef, sessionRef;
+    private DatabaseReference tuitionRef, sessionRef,tuitionInfoRef;
     private String  mUserId, cTuitionId,completedDays;
 
     List<DaySchedule> Schedule= new ArrayList<>();
@@ -141,6 +144,8 @@ public class TuitionDetails extends AppCompatActivity {
 
         Storageref = FirebaseStorage.getInstance().getReference("Images");
         tuitionInfoRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId);
+        sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(cTuitionId);
+
 
 
         Calendar now = Calendar.getInstance();
@@ -169,7 +174,9 @@ public class TuitionDetails extends AppCompatActivity {
         });
 
 
-
+        binding.deleteTuitionBtn.setOnClickListener(v -> {
+            DeleteTuition();
+        });
 
 
         binding.tuitionDSDate.setOnClickListener(v -> {
@@ -249,6 +256,32 @@ public class TuitionDetails extends AppCompatActivity {
 
 
     }
+
+    private void DeleteTuition() {
+        ShowDialog();
+        final StorageReference ref = Storageref.child(cTuitionId + ".jpg");
+        ref.delete().addOnSuccessListener(aVoid -> {
+            sessionRef.removeValue().addOnSuccessListener(aVoid1 -> {
+                tuitionInfoRef.removeValue().addOnSuccessListener(aVoid2 -> {
+                    alertDialog.dismiss();
+                    Toast.makeText(this, "Deleted Successfully", Toast.LENGTH_SHORT).show();
+                    startActivity(new Intent(this,MainActivity.class));
+                    finish();
+                }).addOnFailureListener(e -> {
+                    alertDialog.dismiss();
+                    Toast.makeText(this, "Couldn't Delete", Toast.LENGTH_SHORT).show();
+                });
+            }).addOnFailureListener(e -> {
+                alertDialog.dismiss();
+                Toast.makeText(this, "Couldn't Delete", Toast.LENGTH_SHORT).show();
+            });
+        }).addOnFailureListener(e -> {
+            alertDialog.dismiss();
+            Toast.makeText(this, "Couldn't Delete", Toast.LENGTH_SHORT).show();
+        });
+
+    }
+
     private void getWeeklySchedule() {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TuitionDetails.this);
@@ -506,6 +539,7 @@ public class TuitionDetails extends AppCompatActivity {
                 }
 
 
+
             }
 
             @Override
@@ -529,7 +563,7 @@ public class TuitionDetails extends AppCompatActivity {
 
     private void RetriveSessionInfoList() {
 
-        sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(cTuitionId);
+
         FirebaseRecyclerOptions<SessionInfo> options = new FirebaseRecyclerOptions.Builder<SessionInfo>().setQuery(sessionRef, SessionInfo.class).build();
         final FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder> adapter
                 = new FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder>(options) {
@@ -554,11 +588,19 @@ public class TuitionDetails extends AppCompatActivity {
                         holder.sBinding.sessionCardTpc.setText("Topic: "+dataSnapshot.child("topic").getValue().toString());
 
 
-//                        holder.itemView.setOnClickListener(v -> {
-//                            Intent nSession = new Intent(TuitionDetails.this, SessionDetails.class);
-//                            nSession.putExtra("SessionId", SessionIDs);
-//                            startActivity(nSession);
-//                        });
+                        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                            @Override
+                            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                                return false;
+                            }
+                            @Override
+                            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+
+                                sessionRef.child(SessionIDs).removeValue();
+                                Toast.makeText(TuitionDetails.this, "Note deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        }).attachToRecyclerView(binding.sessionRecycler);
 
 
                     }

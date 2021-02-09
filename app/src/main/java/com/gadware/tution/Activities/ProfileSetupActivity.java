@@ -3,8 +3,11 @@ package com.gadware.tution.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
 import com.gadware.tution.R;
@@ -20,6 +23,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     private DatabaseReference userRef;
     private String email, password, rePass, address, mobile, uid, name;
     private ActivityProfileSetupBinding binding;
+    private AlertDialog alertDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +56,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
 
 
     private void SignInUser() {
-
+        Showialog();
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
@@ -63,6 +67,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         User user = new User(uid, email, password, address, mobile, name);
                         userRef = FirebaseDatabase.getInstance().getReference("Users").getRef();
                         userRef.child(uid).child("UserInfo").setValue(user).addOnSuccessListener(aVoid -> {
+                            alertDialog.dismiss();
                             Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(ProfileSetupActivity.this, MainActivity.class));
                             finish();
@@ -71,6 +76,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         });
                     }
                 }).addOnFailureListener(e -> {
+                    alertDialog.dismiss();
                     Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         });
     }
@@ -124,5 +130,16 @@ public class ProfileSetupActivity extends AppCompatActivity {
             binding.inputReEnterPassword.setError(null);
         }
         return valid;
+    }
+
+    private void Showialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(ProfileSetupActivity.this);
+// ...Irrelevant code for customizing the buttons and title
+        LayoutInflater inflater = ProfileSetupActivity.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
+        dialogBuilder.setView(dialogView);
+        alertDialog = dialogBuilder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
     }
 }

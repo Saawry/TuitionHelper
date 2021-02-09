@@ -13,8 +13,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingLeft="25dp"
-            android:paddingRight="24dp">
+            android:paddingStart="25dp"
+            android:paddingEnd="24dp">
 
             <ImageView
                 android:layout_width="150dp"
@@ -24,7 +24,6 @@
                 android:src="@drawable/tuition_logo" />
 
 
-            <!-- Name Label -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -52,7 +51,7 @@
                     android:hint="Mobile Number"
                     android:inputType="number" />
             </com.google.android.material.textfield.TextInputLayout>
-            <!-- Address Label -->
+
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -67,8 +66,6 @@
                     android:inputType="textPostalAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
-
-            <!--  Email Label -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -83,11 +80,6 @@
                     android:inputType="textEmailAddress" />
             </com.google.android.material.textfield.TextInputLayout>
 
-
-            <!-- mobile number -->
-
-
-            <!-- Password Label -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -102,7 +94,6 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Password Re-enter Label -->
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -117,14 +108,13 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- Signup Button -->
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_signup"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+               android:background="@drawable/btn_background_round"
+                android:layout_height="30dp"
                 android:layout_marginTop="24dp"
                 android:layout_marginBottom="24dp"
-                android:padding="12dp"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:text="Create Account" />

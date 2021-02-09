@@ -56,12 +56,12 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <androidx.appcompat.widget.AppCompatButton
+                android:background="@drawable/btn_background_round"
                 android:id="@+id/btnLogin"
                 android:textColor="@color/white"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_marginTop="24dp"
-                android:padding="12dp"
                 android:text="Login"
                 android:textAllCaps="false" />
 
@@ -73,16 +73,17 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:textSize="18sp"
+                android:textColor="@color/white"
                 android:text="or" />
 
-            <androidx.appcompat.widget.AppCompatButton
+            <Button
                 android:id="@+id/btnNewAcc"
+                android:background="@drawable/btn_background_round"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_marginTop="10dp"
-                android:padding="12dp"
                 android:textColor="@color/white"
-                android:text="Create Acc"
+                android:text="Sign Up"
                 android:textAllCaps="false" />
         </LinearLayout>
     </ScrollView>
