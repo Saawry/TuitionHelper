@@ -72,7 +72,6 @@
             tools:ignore="RelativeOverlap" />
 
         <LinearLayout
-            android:id="@+id/no_data_layout"
             android:visibility="visible"
             android:layout_marginLeft="5dp"
             android:layout_marginRight="5dp"
@@ -80,12 +79,20 @@
             android:layout_marginBottom="25dp"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
-            android:background="@drawable/no_data_vector"
+            android:background="@color/primary_lighter"
             android:layout_above="@+id/adView"
             android:layout_below="@+id/toolbarview"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal" />
+            android:orientation="horizontal" >
+
+            <ImageView
+                android:visibility="visible"
+                android:src="@drawable/no_data_vector"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/no_data_layout"/>
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
 

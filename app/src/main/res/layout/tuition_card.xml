@@ -20,7 +20,7 @@
                 android:layout_width="0dp"
                 android:layout_weight=".9"
                 android:layout_height="match_parent"
-                android:padding="5dp"
+                android:padding="2dp"
                 app:cardCornerRadius="45dp">
 
                 <ImageView

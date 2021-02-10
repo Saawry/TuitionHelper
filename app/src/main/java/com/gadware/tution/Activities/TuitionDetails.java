@@ -10,11 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,10 +41,6 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -61,7 +60,9 @@ import java.util.Objects;
 
 public class TuitionDetails extends AppCompatActivity {
     private AlertDialog alertDialog;
-    ActivityTuitionDetailsBinding binding;
+    private  AlertDialog alert;
+
+    private ActivityTuitionDetailsBinding binding;
 
 
     StorageReference Storageref;
@@ -76,11 +77,12 @@ public class TuitionDetails extends AppCompatActivity {
 
 
     private final Calendar myCalendar = Calendar.getInstance();
-    private DatabaseReference tuitionRef, sessionRef,tuitionInfoRef;
-    private String  mUserId, cTuitionId,completedDays;
+    private DatabaseReference tuitionRef, sessionRef, tuitionInfoRef;
+    private String mUserId, cTuitionId, completedDays;
 
-    List<DaySchedule> Schedule= new ArrayList<>();
-    List<DaySchedule> NewDaySchedule= new ArrayList<>();
+    List<DaySchedule> Schedule = new ArrayList<>();
+    List<DaySchedule> NewDaySchedule = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -88,13 +90,11 @@ public class TuitionDetails extends AppCompatActivity {
 
         binding = DataBindingUtil.setContentView(this, R.layout.activity_tuition_details);
         cTuitionId = getIntent().getExtras().get("Tuition_id").toString();
-        mUserId= FirebaseAuth.getInstance().getUid();
+        mUserId = FirebaseAuth.getInstance().getUid();
         binding.sessionRecycler.setLayoutManager(new LinearLayoutManager(this));
 
-        ShowDialog();
-        RetriveTuitionInfo();
-        RetriveScheduleInfo();
-        RetriveSessionInfoList();
+        ShowLoadingDialog();
+
 
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
@@ -147,10 +147,13 @@ public class TuitionDetails extends AppCompatActivity {
         sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(cTuitionId);
 
 
+        RetriveTuitionInfo();
+        RetriveScheduleInfo();
+        RetriveSessionInfoList();
 
         Calendar now = Calendar.getInstance();
         int yr = now.get(Calendar.YEAR);
-        int mnth = now.get(Calendar.MONTH) ; // Note: result may zero based!(+1)
+        int mnth = now.get(Calendar.MONTH); // Note: result may zero based!(+1)
         int day = now.get(Calendar.DAY_OF_MONTH);
         String myDateFormat = "dd.MM.yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myDateFormat, Locale.US);
@@ -187,28 +190,11 @@ public class TuitionDetails extends AppCompatActivity {
 
 
                 binding.tuitionDSDate.setText(sdf.format(myCalendar.getTime()));
-                DatabaseReference sDtRef=FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId).child("sDate");
+                DatabaseReference sDtRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId).child("sDate");
                 sDtRef.setValue(binding.tuitionDSDate.getText().toString());
             }, yr, mnth, day);
             nDate.show();
-
-//            AlertDialog.Builder builder = new AlertDialog.Builder(TuitionDetails.this);
-//            builder.setTitle("Input Start Date");
-//
-//            final EditText input = new EditText(TuitionDetails.this);
-//            input.setInputType(InputType.TYPE_CLASS_DATETIME);
-//            builder.setView(input);
-//
-//            final String[] m_Text = new String[1];
-//            builder.setPositiveButton("OK", (dialog, which) -> m_Text[0] = input.getText().toString());
-//            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-//            builder.show();
         });
-
-
-
-
-
 
 
         binding.tuitionDEDate.setOnClickListener(v -> {
@@ -218,54 +204,30 @@ public class TuitionDetails extends AppCompatActivity {
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
                 binding.tuitionDEDate.setText(sdf.format(myCalendar.getTime()));
-                DatabaseReference sDtRef=FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId).child("eDate");
+                DatabaseReference sDtRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId).child("eDate");
                 sDtRef.setValue(binding.tuitionDEDate.getText().toString());
             }, yr, mnth, day);
             nDate.show();
 
-//            AlertDialog.Builder builder = new AlertDialog.Builder(TuitionDetails.this);
-//            builder.setTitle("Input End Date");
-//
-//            final EditText input = new EditText(TuitionDetails.this);
-//            input.setInputType(InputType.TYPE_CLASS_DATETIME);
-//            builder.setView(input);
-//
-//            final String[] m_Text = new String[1];
-//            builder.setPositiveButton("OK", (dialog, which) -> m_Text[0] = input.getText().toString());
-//            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
-//            builder.show();
         });
 
         binding.tuitionDDSpin.setOnClickListener(v -> {
             RetriveScheduleInfo();
             getWeeklySchedule();
-
-
-//            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TuitionDetails.this);
-//
-//            LayoutInflater inflater = TuitionDetails.this.getLayoutInflater();
-//            View dialogView = inflater.inflate(R.layout.weekly_days_select, null);
-//            dialogBuilder.setView(dialogView);
-//
-//            EditText satEt =  dialogView.findViewById(R.id.satTimeET);
-//            CheckBox satCB =  dialogView.findViewById(R.id.satcheckBox);
-//
-//            AlertDialog alertDialog = dialogBuilder.create();
-//            alertDialog.show();
         });
 
 
     }
 
     private void DeleteTuition() {
-        ShowDialog();
+        ShowLoadingDialog();
         final StorageReference ref = Storageref.child(cTuitionId + ".jpg");
         ref.delete().addOnSuccessListener(aVoid -> {
             sessionRef.removeValue().addOnSuccessListener(aVoid1 -> {
                 tuitionInfoRef.removeValue().addOnSuccessListener(aVoid2 -> {
                     alertDialog.dismiss();
                     Toast.makeText(this, "Deleted Successfully", Toast.LENGTH_SHORT).show();
-                    startActivity(new Intent(this,MainActivity.class));
+                    startActivity(new Intent(this, MainActivity.class));
                     finish();
                 }).addOnFailureListener(e -> {
                     alertDialog.dismiss();
@@ -308,44 +270,44 @@ public class TuitionDetails extends AppCompatActivity {
 
         Button confirmBtn = dialogView.findViewById(R.id.confirm_schedule_btn);
 
-        for (DaySchedule daySchedule:Schedule){
-            if (daySchedule.getDayName().equals("SAT")){
+        for (DaySchedule daySchedule : Schedule) {
+            if (daySchedule.getDayName().equals("SAT")) {
                 satCB.setChecked(true);
                 satEt.setVisibility(View.VISIBLE);
                 satEt.setText(daySchedule.getTime());
                 continue;
             }
-            if (daySchedule.getDayName().equals("SUN")){
+            if (daySchedule.getDayName().equals("SUN")) {
                 sunCB.setChecked(true);
                 sunEt.setVisibility(View.VISIBLE);
                 sunEt.setText(daySchedule.getTime());
                 continue;
             }
-            if (daySchedule.getDayName().equals("MON")){
+            if (daySchedule.getDayName().equals("MON")) {
                 monCB.setChecked(true);
                 monEt.setVisibility(View.VISIBLE);
                 monEt.setText(daySchedule.getTime());
                 continue;
             }
-            if (daySchedule.getDayName().equals("TUE")){
+            if (daySchedule.getDayName().equals("TUE")) {
                 tueCB.setChecked(true);
                 tueEt.setVisibility(View.VISIBLE);
                 tueEt.setText(daySchedule.getTime());
                 continue;
             }
-            if (daySchedule.getDayName().equals("WED")){
+            if (daySchedule.getDayName().equals("WED")) {
                 wedCB.setChecked(true);
                 wedEt.setVisibility(View.VISIBLE);
                 wedEt.setText(daySchedule.getTime());
                 continue;
             }
-            if (daySchedule.getDayName().equals("THU")){
+            if (daySchedule.getDayName().equals("THU")) {
                 thuCB.setChecked(true);
                 thuEt.setVisibility(View.VISIBLE);
                 thuEt.setText(daySchedule.getTime());
                 continue;
             }
-            if (daySchedule.getDayName().equals("FRI")){
+            if (daySchedule.getDayName().equals("FRI")) {
                 friCB.setChecked(true);
                 friEt.setVisibility(View.VISIBLE);
                 friEt.setText(daySchedule.getTime());
@@ -418,7 +380,7 @@ public class TuitionDetails extends AppCompatActivity {
                     NewDaySchedule.add(new DaySchedule("FRI", time));
                 }
             }
-            if (NewDaySchedule.size()>0){
+            if (NewDaySchedule.size() > 0) {
                 AddSchedules(cTuitionId);
             }
 
@@ -443,8 +405,8 @@ public class TuitionDetails extends AppCompatActivity {
         binding.tuitionDDSpin.setText("");
         FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId).child(id).child("weeklyDays").setValue(String.valueOf(NewDaySchedule.size()));
         FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id).removeValue();
-        for (DaySchedule daySchedule:NewDaySchedule){
-            binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" "+daySchedule.getDayName());
+        for (DaySchedule daySchedule : NewDaySchedule) {
+            binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " " + daySchedule.getDayName());
             DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id);
             ScheduleRef.child(daySchedule.getDayName()).setValue(daySchedule.getTime());
         }
@@ -458,46 +420,46 @@ public class TuitionDetails extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Schedule.clear();
                 binding.tuitionDDSpin.setText("");
-                if (snapshot.child("SAT").exists()){
-                    String Time= Objects.requireNonNull(snapshot.child("SAT").getValue()).toString();
-                    Schedule.add(new DaySchedule("SAT",Time));
-                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" SAT");
+                if (snapshot.child("SAT").exists()) {
+                    String Time = Objects.requireNonNull(snapshot.child("SAT").getValue()).toString();
+                    Schedule.add(new DaySchedule("SAT", Time));
+                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " SAT");
                 }
 
-                if (snapshot.child("SUN").exists()){
-                    String Time= Objects.requireNonNull(snapshot.child("SUN").getValue()).toString();
-                    Schedule.add(new DaySchedule("SUN",Time));
-                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" SUN");
+                if (snapshot.child("SUN").exists()) {
+                    String Time = Objects.requireNonNull(snapshot.child("SUN").getValue()).toString();
+                    Schedule.add(new DaySchedule("SUN", Time));
+                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " SUN");
                 }
 
-                if (snapshot.child("MON").exists()){
-                    String Time= Objects.requireNonNull(snapshot.child("MON").getValue()).toString();
-                    Schedule.add(new DaySchedule("MON",Time));
-                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" MON");
+                if (snapshot.child("MON").exists()) {
+                    String Time = Objects.requireNonNull(snapshot.child("MON").getValue()).toString();
+                    Schedule.add(new DaySchedule("MON", Time));
+                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " MON");
                 }
 
-                if (snapshot.child("TUE").exists()){
-                    String Time= Objects.requireNonNull(snapshot.child("TUE").getValue()).toString();
-                    Schedule.add(new DaySchedule("TUE",Time));
-                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" TUE");
+                if (snapshot.child("TUE").exists()) {
+                    String Time = Objects.requireNonNull(snapshot.child("TUE").getValue()).toString();
+                    Schedule.add(new DaySchedule("TUE", Time));
+                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " TUE");
                 }
 
-                if (snapshot.child("WED").exists()){
-                    String Time= Objects.requireNonNull(snapshot.child("WED").getValue()).toString();
-                    Schedule.add(new DaySchedule("WED",Time));
-                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" WED");
+                if (snapshot.child("WED").exists()) {
+                    String Time = Objects.requireNonNull(snapshot.child("WED").getValue()).toString();
+                    Schedule.add(new DaySchedule("WED", Time));
+                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " WED");
                 }
 
-                if (snapshot.child("THU").exists()){
-                    String Time= Objects.requireNonNull(snapshot.child("THU").getValue()).toString();
-                    Schedule.add(new DaySchedule("THU",Time));
-                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" THU");
+                if (snapshot.child("THU").exists()) {
+                    String Time = Objects.requireNonNull(snapshot.child("THU").getValue()).toString();
+                    Schedule.add(new DaySchedule("THU", Time));
+                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " THU");
                 }
 
-                if (snapshot.child("FRI").exists()){
-                    String Time= Objects.requireNonNull(snapshot.child("FRI").getValue()).toString();
-                    Schedule.add(new DaySchedule("FRI",Time));
-                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText()+" FRI");
+                if (snapshot.child("FRI").exists()) {
+                    String Time = Objects.requireNonNull(snapshot.child("FRI").getValue()).toString();
+                    Schedule.add(new DaySchedule("FRI", Time));
+                    binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " FRI");
                 }
 
             }
@@ -517,12 +479,12 @@ public class TuitionDetails extends AppCompatActivity {
         tuitionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-
+                alertDialog.dismiss();
                 binding.tuitionDSName.setText(snapshot.child("studentName").getValue().toString());
                 binding.tuitionDLocation.setText(snapshot.child("location").getValue().toString());
                 binding.tuitionDMobile.setText(snapshot.child("mobile").getValue().toString());
-                binding.tuitionDWD.setText("Weekly "+snapshot.child("weeklyDays").getValue().toString()+" Days");
-                binding.tuitionDRemu.setText(snapshot.child("remuneration").getValue().toString());
+                binding.tuitionDWD.setText("Weekly " + snapshot.child("weeklyDays").getValue().toString() + " Days");
+                binding.tuitionDRemu.setText(snapshot.child("remuneration").getValue().toString()+" BDT");
 
                 String td = snapshot.child("totalDays").getValue().toString();
                 completedDays = snapshot.child("completedDays").getValue().toString();
@@ -539,13 +501,10 @@ public class TuitionDetails extends AppCompatActivity {
                 }
 
 
-
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
-            }
+            public void onCancelled(@NonNull DatabaseError error) {alertDialog.dismiss(); }
         });
 
 
@@ -563,10 +522,8 @@ public class TuitionDetails extends AppCompatActivity {
 
     private void RetriveSessionInfoList() {
 
-
         FirebaseRecyclerOptions<SessionInfo> options = new FirebaseRecyclerOptions.Builder<SessionInfo>().setQuery(sessionRef, SessionInfo.class).build();
-        final FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder> adapter
-                = new FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder>(options) {
+        final FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder> adapter = new FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder>(options) {
             @Override
             protected void onBindViewHolder(@NonNull final SessionsViewHolder holder, int position, @NonNull SessionInfo model) {
 
@@ -574,40 +531,48 @@ public class TuitionDetails extends AppCompatActivity {
                 sessionRef.child(SessionIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        //SessionInfo sessionInfo= (SessionInfo) dataSnapshot.getValue();
                         alertDialog.dismiss();
-                        String dt = dataSnapshot.child("date").getValue().toString();
-                        String dy = dataSnapshot.child("day").getValue().toString();
+                        if (dataSnapshot.hasChildren()) {
+                            binding.noDataLayout.setVisibility(View.GONE);
+                            String dt = dataSnapshot.child("date").getValue().toString();
+                            String dy = dataSnapshot.child("day").getValue().toString();
 
-                        String t = dataSnapshot.child("time").getValue().toString();
-                        String et = dataSnapshot.child("eTime").getValue().toString();
+                            String t = dataSnapshot.child("time").getValue().toString();
+                            String et = dataSnapshot.child("eTime").getValue().toString();
 
-                        holder.sBinding.sessionCardDD.setText(dt + "   " + dy);
-                        holder.sBinding.sessionCardTT.setText(t + "  to " + et);
-                        holder.sBinding.sessionCardCount.setText("Session No. "+dataSnapshot.child("counter").getValue().toString());
-                        holder.sBinding.sessionCardTpc.setText("Topic: "+dataSnapshot.child("topic").getValue().toString());
-
-
-                        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
-                                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-                            @Override
-                            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-                                return false;
-                            }
-                            @Override
-                            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-
-                                sessionRef.child(SessionIDs).removeValue();
-                                Toast.makeText(TuitionDetails.this, "Note deleted", Toast.LENGTH_SHORT).show();
-                            }
-                        }).attachToRecyclerView(binding.sessionRecycler);
+                            holder.sBinding.sessionCardDD.setText(dt + "   " + dy);
+                            holder.sBinding.sessionCardTT.setText(t + "  to " + et);
+                            holder.sBinding.sessionCardCount.setText("Session No. " + dataSnapshot.child("counter").getValue().toString());
+                            holder.sBinding.sessionCardTpc.setText("Topic: " + dataSnapshot.child("topic").getValue().toString());
 
 
+                        holder.itemView.setOnClickListener(v -> {
+                            Intent intent = new Intent(TuitionDetails.this, SessionDetails.class);
+                            intent.putExtra("sessionId", SessionIDs);
+                            intent.putExtra("tuitionId", cTuitionId);
+                            startActivity(intent);
+                        });
+
+                            new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                                    ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+                                @Override
+                                public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                                    return false;
+                                }
+
+                                @Override
+                                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                                    ShowDeleteDialog(SessionIDs);
+                                }
+                            }).attachToRecyclerView(binding.sessionRecycler);
+
+                        }
                     }
 
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                        Toast.makeText(TuitionDetails.this, databaseError.toString(), Toast.LENGTH_SHORT).show();
+                        alertDialog.dismiss();
+                        Toast.makeText(TuitionDetails.this,"Database Error", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -626,8 +591,6 @@ public class TuitionDetails extends AppCompatActivity {
         adapter.startListening();
 
     }
-
-
 
 
     @Override
@@ -661,7 +624,7 @@ public class TuitionDetails extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             imageUri = data.getData();
             binding.tuitionDImg.setImageURI(imageUri);
-            ShowDialog();
+            ShowLoadingDialog();
             UploadImage(imageUri);
         }
     }
@@ -686,7 +649,7 @@ public class TuitionDetails extends AppCompatActivity {
         }).addOnFailureListener(e -> alertDialog.dismiss());
     }
 
-    private void ShowDialog() {
+    private void ShowLoadingDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(TuitionDetails.this);
         LayoutInflater inflater = TuitionDetails.this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
@@ -694,6 +657,26 @@ public class TuitionDetails extends AppCompatActivity {
         alertDialog = dialogBuilder.create();
         alertDialog.setCancelable(false);
         alertDialog.show();
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            alertDialog.dismiss();
+        }, 3000);
+    }
+    private void ShowDeleteDialog(String SessionIDs){
+        AlertDialog.Builder builder = new AlertDialog.Builder(TuitionDetails.this,R.style.AppTheme_Dark_Dialog);
+        builder.setMessage("Want to delete this session ?")
+                .setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, id) -> {
+                    sessionRef.child(SessionIDs).removeValue();
+                    Toast.makeText(TuitionDetails.this, "Note deleted", Toast.LENGTH_SHORT).show();
+                    dialog.dismiss();
+                })
+                .setNegativeButton("No", (DialogInterface.OnClickListener) (dialog, id) -> {
+                    dialog.dismiss();
+                    recreate();
+                });
+
+        alert = builder.create();
+        alert.setTitle("Delete Session");
+        alert.show();
     }
 }
 

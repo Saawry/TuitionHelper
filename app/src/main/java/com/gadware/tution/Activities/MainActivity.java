@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,7 +36,7 @@ import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
     private AlertDialog alertDialog;
 
     private FirebaseDatabase firedb;
@@ -98,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
         alertDialog = dialogBuilder.create();
         alertDialog.setCancelable(false);
         alertDialog.show();
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            alertDialog.dismiss();
+        }, 3000);
     }
 
     private void RetriveTuitionInfoList() {
@@ -109,30 +115,31 @@ public class MainActivity extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull final TuitionssViewHolder holder, int position, @NonNull TuitionInfo model) {
 
                 final String TuitionIDs = getRef(position).getKey();
-                final String[] TuitonImage = {"default_image"};
                 tuitionRef.child(TuitionIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        alertDialog.dismiss();
-                        if (dataSnapshot.hasChild("ImageUri")) {
-                            Glide.with(MainActivity.this).load(dataSnapshot.child("ImageUri").getValue().toString()).into(holder.tBinding.ProfileIcon);
+                        if (dataSnapshot.hasChildren()) {
+                            binding.noDataLayout.setVisibility(View.GONE);
+                            alertDialog.dismiss();
+                            if (dataSnapshot.hasChild("ImageUri")) {
+                                Glide.with(MainActivity.this).load(dataSnapshot.child("ImageUri").getValue().toString()).into(holder.tBinding.ProfileIcon);
+                            }
+
+                            String tDAys = dataSnapshot.child("totalDays").getValue().toString();
+                            String cDAys = dataSnapshot.child("completedDays").getValue().toString();
+                            String wDAys = dataSnapshot.child("weeklyDays").getValue().toString();
+
+                            holder.tBinding.tuitionCardTitle.setText(dataSnapshot.child("studentName").getValue().toString());
+                            holder.tBinding.tuitionCardLocation.setText(dataSnapshot.child("location").getValue().toString());
+                            holder.tBinding.tuitionCardDays.setText("Done " + cDAys + " of " + tDAys + " days");
+                            holder.tBinding.tuitionCardWeekly.setText("Weekly " + wDAys + " days");
+
+                            holder.itemView.setOnClickListener(v -> {
+                                Intent tdIntent = new Intent(MainActivity.this, TuitionDetails.class);
+                                tdIntent.putExtra("Tuition_id", TuitionIDs);
+                                startActivity(tdIntent);
+                            });
                         }
-
-                        String tDAys = dataSnapshot.child("totalDays").getValue().toString();
-                        String cDAys = dataSnapshot.child("completedDays").getValue().toString();
-                        String wDAys = dataSnapshot.child("weeklyDays").getValue().toString();
-
-                        holder.tBinding.tuitionCardTitle.setText(dataSnapshot.child("studentName").getValue().toString());
-                        holder.tBinding.tuitionCardLocation.setText(dataSnapshot.child("location").getValue().toString());
-                        holder.tBinding.tuitionCardDays.setText("Done " + cDAys + " of " + tDAys + " days");
-                        holder.tBinding.tuitionCardWeekly.setText("Weekly " + wDAys + " days");
-
-                        holder.itemView.setOnClickListener(v -> {
-                            Intent tdIntent = new Intent(MainActivity.this, TuitionDetails.class);
-                            tdIntent.putExtra("Tuition_id", TuitionIDs);
-                            startActivity(tdIntent);
-                        });
-
 
                     }
 

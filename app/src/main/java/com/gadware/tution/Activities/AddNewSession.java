@@ -35,7 +35,7 @@ public class AddNewSession extends AppCompatActivity {
 
     ActivityAddNewSessionBinding binding;
     private final Calendar myCalendar = Calendar.getInstance();
-    private String id,  date,  day,  time, etime,  topic;
+    private String id, date,  day, time, etime,  topic;
     int counter;
     private String userId,tuitionid,completedDays;
 
@@ -52,7 +52,7 @@ public class AddNewSession extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
         Calendar now = Calendar.getInstance();
         int yr = now.get(Calendar.YEAR);
-        int mnth = now.get(Calendar.MONTH) ; // Note: result may zero based!(+1)
+        int mnth = now.get(Calendar.MONTH);
         int day = now.get(Calendar.DAY_OF_MONTH);
         int today = now.get(Calendar.DAY_OF_WEEK);
         int hour = now.get(Calendar.HOUR_OF_DAY);
@@ -78,13 +78,12 @@ public class AddNewSession extends AppCompatActivity {
 
 
         binding.inputDate.setOnClickListener(v -> {
-            //date.show();
             DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, month);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-
+                binding.inputDay.setText(GetDAY(myCalendar.get(Calendar.DAY_OF_WEEK)));
                 binding.inputDate.setText(sdf.format(myCalendar.getTime()));
             }, yr, mnth, day);
             nDate.show();
@@ -122,21 +121,6 @@ public class AddNewSession extends AppCompatActivity {
     }
 
     private void InsertNewSession() {
-//        tuitionRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid);
-//        tuitionRef.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                long cc=snapshot.getChildrenCount();
-//                cc++;
-//                counter=String.valueOf(cc);
-//
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//
-//            }
-//        });
         DatabaseReference sessnRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
         id=sessnRef.getKey();
         SessionInfo sessionInfo=new SessionInfo(id,date,day,time,etime,topic,String.valueOf(counter));

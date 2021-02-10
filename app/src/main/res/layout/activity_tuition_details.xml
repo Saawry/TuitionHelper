@@ -9,7 +9,29 @@
         android:orientation="vertical"
         tools:context=".Activities.TuitionDetails">
 
+        <LinearLayout
+           android:background="@color/primary_dark"
+            android:layout_marginBottom="5dp"
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start">
+
+            <TextView
+                android:gravity="center_vertical"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:text="Tuition Details"
+                android:paddingStart="25dp"
+                tools:ignore="RtlSymmetry">
+            </TextView>
+        </LinearLayout>
+
         <androidx.cardview.widget.CardView
+
+            android:layout_below="@+id/toolbar"
             android:id="@+id/details_cardv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -48,23 +70,25 @@
                         android:id="@+id/tuitionDSName"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1.2"
+                        android:layout_weight="1"
                         android:padding="5dp"
-                        android:textAlignment="center"
                         android:text="Student Name"
+                        android:textAlignment="center"
                         android:textColor="@color/primary_dark"
                         android:textSize="17dp"
                         android:textStyle="bold|italic" />
 
                     <TextView
-                        android:id="@+id/tuitionDLocation"
+                        android:id="@+id/tuitionDMobile"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight=".8"
-                        android:padding="3dp"
-                        android:text="Location"
+                        android:layout_weight="1"
+                        android:padding="5dp"
+                        android:text="01000000000"
                         android:textAlignment="center"
-                        android:textSize="17dp" />
+                        android:textSize="16dp"
+                        app:drawableStartCompat="@drawable/ic_baseline_phone_24"
+                        app:drawableTint="@color/teal_700" />
 
                 </LinearLayout>
 
@@ -80,24 +104,32 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1.2"
+                        android:background="@drawable/btn_background_stroke"
                         android:maxLines="1"
                         android:padding="5dp"
                         android:text="Sat,Sun,Mon"
                         android:textAlignment="center"
+                        android:textColor="@color/teal_700"
                         android:textSize="15dp" />
 
+
                     <TextView
-                        android:id="@+id/tuitionDMobile"
+                        android:id="@+id/tuitionDLocation"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight=".8"
-                        android:padding="5dp"
+                        android:padding="3dp"
+                        android:text="Location"
                         android:textAlignment="center"
-                        android:text="01000000000"
-                        android:textSize="16dp" />
-
-
+                        android:textSize="17dp"
+                        app:drawableStartCompat="@drawable/ic_baseline_location_on_24"
+                        app:drawableTint="@color/teal_700" />
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/teal_700" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -111,7 +143,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight=".4"
                         android:padding="3dp"
-                        android:text="Start" />
+                        android:text="Start"
+                        android:textColor="@color/black" />
 
                     <TextView
                         android:id="@+id/tuitionDSDate"
@@ -120,14 +153,17 @@
                         android:layout_weight="1.1"
                         android:padding="3dp"
                         android:text="00/00/0000"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        app:drawableStartCompat="@drawable/ic_baseline_calendar_today_24"
+                        app:drawableTint="@color/black" />
 
                     <TextView
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight=".4"
                         android:padding="3dp"
-                        android:text="End" />
+                        android:text="End"
+                        android:textColor="@color/black" />
 
                     <TextView
                         android:id="@+id/tuitionDEDate"
@@ -136,9 +172,16 @@
                         android:layout_weight="1.1"
                         android:padding="3dp"
                         android:text="00/00/0000"
-                        android:textAlignment="center" />
+                        android:textAlignment="center"
+                        app:drawableStartCompat="@drawable/ic_baseline_calendar_today_24"
+                        app:drawableTint="@color/black" />
 
                 </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/teal_700" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -146,6 +189,7 @@
                     android:orientation="horizontal"
                     android:padding="5dp"
                     android:weightSum="4">
+
 
                     <TextView
                         android:id="@+id/tuitionDDTD"
@@ -195,6 +239,30 @@
             android:textAllCaps="false"
             android:textColor="@color/white" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/adView"
+            android:layout_below="@+id/deleteTuitionBtn"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="25dp"
+            android:background="@color/primary_lighter"
+            android:orientation="horizontal"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/no_data_layout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/no_data_vector"
+                android:visibility="visible" />
+        </LinearLayout>
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/sessionRecycler"
             android:layout_width="match_parent"
@@ -220,22 +288,6 @@
             android:src="@drawable/ic_baseline_add_circle_outline_24"
             android:tint="@color/white"
             tools:ignore="RelativeOverlap" />
-
-        <LinearLayout
-            android:id="@+id/no_data_layout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/adView"
-            android:layout_below="@+id/deleteTuitionBtn"
-            android:layout_marginLeft="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/no_data_vector"
-            android:orientation="horizontal"
-            android:paddingLeft="5dp"
-            android:paddingRight="5dp"
-            android:visibility="gone">
-
-        </LinearLayout>
 
         <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:id="@+id/adView"

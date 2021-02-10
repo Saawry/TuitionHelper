@@ -3,7 +3,7 @@
     android:layout_width="wrap_content"
     android:layout_gravity="center"
     android:gravity="center"
-    android:background="@color/transp"
+    android:background="@android:color/transparent"
     android:layout_height="wrap_content">
     <pl.droidsonroids.gif.GifImageView
         android:gravity="center"
