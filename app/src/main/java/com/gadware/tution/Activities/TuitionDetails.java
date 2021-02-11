@@ -2,6 +2,7 @@ package com.gadware.tution.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -78,7 +79,7 @@ public class TuitionDetails extends AppCompatActivity {
 
     private final Calendar myCalendar = Calendar.getInstance();
     private DatabaseReference tuitionRef, sessionRef, tuitionInfoRef;
-    private String mUserId, cTuitionId, completedDays;
+    private String mUserId, cTuitionId, completedDays,mobile;
 
     List<DaySchedule> Schedule = new ArrayList<>();
     List<DaySchedule> NewDaySchedule = new ArrayList<>();
@@ -163,6 +164,25 @@ public class TuitionDetails extends AppCompatActivity {
             nSession.putExtra("completedDays", completedDays);
             startActivity(nSession);
         });
+
+
+        binding.tuitionDMobile.setOnClickListener(v -> {
+
+            Intent i = new Intent(Intent.ACTION_CALL);
+            i.setData(Uri.parse("tel:" + mobile));
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                if (ActivityCompat.checkSelfPermission(TuitionDetails.this,
+                        Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1);
+                    return;
+                }
+            }
+            startActivity(i);
+
+        });
+
+
 
         binding.tuitionDImg.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -483,6 +503,7 @@ public class TuitionDetails extends AppCompatActivity {
                 binding.tuitionDSName.setText(snapshot.child("studentName").getValue().toString());
                 binding.tuitionDLocation.setText(snapshot.child("location").getValue().toString());
                 binding.tuitionDMobile.setText(snapshot.child("mobile").getValue().toString());
+                mobile=snapshot.child("mobile").getValue().toString();
                 binding.tuitionDWD.setText("Weekly " + snapshot.child("weeklyDays").getValue().toString() + " Days");
                 binding.tuitionDRemu.setText(snapshot.child("remuneration").getValue().toString()+" BDT");
 

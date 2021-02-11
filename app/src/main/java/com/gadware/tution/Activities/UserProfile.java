@@ -14,6 +14,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -43,7 +47,7 @@ public class UserProfile extends AppCompatActivity {
     private AlertDialog alertDialog;
     StorageReference Storageref;
     DatabaseReference userInfoRef;
-    String muserId, newImageUrl;
+    String muserId;
     private static final int PERMISSION_ALL = 222;
     private static final String[] PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -76,6 +80,24 @@ public class UserProfile extends AppCompatActivity {
 
 
         });
+
+        binding.inputName.setOnClickListener(v -> {
+            GetValueAndUpdate(binding.inputName,"name",binding.inputName.getText().toString());
+        });
+        binding.inputEmail.setOnClickListener(v -> {
+            GetValueAndUpdate(binding.inputEmail,"email",binding.inputEmail.getText().toString());
+        });
+        binding.inputMobile.setOnClickListener(v -> {
+            GetValueAndUpdate(binding.inputMobile,"mobile",binding.inputMobile.getText().toString());
+        });
+        binding.inputAddress.setOnClickListener(v -> {
+            GetValueAndUpdate(binding.inputAddress,"address",binding.inputAddress.getText().toString());
+        });
+
+
+
+
+
         binding.signoutBtn.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(this, LoginActivity.class));
@@ -158,18 +180,11 @@ public class UserProfile extends AppCompatActivity {
                 userInfoRef.child("ImageUri").setValue(downloadUri.toString());
                 alertDialog.dismiss();
             }
-        }).addOnFailureListener(e -> {
-            alertDialog.dismiss();
-        });
+        }).addOnFailureListener(e ->
+            alertDialog.dismiss()
+        );
 
 
-//        Storageref.child(muserId+".jpg").putFile(imageUri).addOnSuccessListener(taskSnapshot -> {
-//
-//                    newImageUrl = Storageref.child(muserId+".jpg").getDownloadUrl().toString();
-//                    userInfoRef.child("ImageUri").setValue(newImageUrl);
-//                }
-//
-//        ).addOnFailureListener(e -> Toast.makeText(UserProfile.this, "Error: " + e.getMessage(), Toast.LENGTH_SHORT).show());
     }
 
     private void Showialog() {
@@ -182,5 +197,44 @@ public class UserProfile extends AppCompatActivity {
         alertDialog.setCancelable(false);
         alertDialog.show();
     }
+
+
+
+    private void GetValueAndUpdate(TextView tv, String key,String value) {
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_update_value, null);
+        dialogBuilder.setView(dialogView);
+
+        EditText editText = dialogView.findViewById(R.id.dialog_input);
+        Button cancelBtn = dialogView.findViewById(R.id.dialog_cancel_btn);
+        Button updateBtn = dialogView.findViewById(R.id.dialog_update_btn);
+        editText.setText(value);
+
+        cancelBtn.setOnClickListener(v ->
+            alertDialog.dismiss()
+        );
+
+        updateBtn.setOnClickListener(v -> {
+            String newValue = editText.getText().toString();
+            if (newValue.equals(value)){
+                alertDialog.dismiss();
+            }else if (newValue.length() < 4){
+                editText.setError("Minimum length 4");
+            }else{
+                userInfoRef.child(key).setValue(newValue).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Updated "+key, Toast.LENGTH_SHORT).show();
+                    alertDialog.dismiss();
+                }).addOnFailureListener(e ->
+                        Toast.makeText(UserProfile.this, "Couldn't update "+key, Toast.LENGTH_SHORT).show());
+                alertDialog.dismiss();
+            }
+        });
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+    }
+
 
 }

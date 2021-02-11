@@ -44,12 +44,14 @@ public class AddNewSession extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_session);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
+
 
         tuitionid=getIntent().getExtras().get("Tuition_id").toString();
         completedDays=getIntent().getExtras().get("completedDays").toString();
         counter = Integer.parseInt(completedDays)+1;
 
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
+
         Calendar now = Calendar.getInstance();
         int yr = now.get(Calendar.YEAR);
         int mnth = now.get(Calendar.MONTH);
