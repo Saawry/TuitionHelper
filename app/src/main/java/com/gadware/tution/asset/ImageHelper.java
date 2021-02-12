@@ -1,5 +1,4 @@
 package com.gadware.tution.asset;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -77,7 +76,9 @@ public class ImageHelper {
         return actuallyUsableBitmap;
     }
 
-
+    /**
+     * Resize to avoid using too much memory loading big images (e.g.: 2560*1920)
+     **/
     public static Bitmap getImageResized(Context context, Uri selectedImage) {
         Bitmap bm = null;
         int[] sampleSizes = new int[]{5, 3, 2, 1};
@@ -220,10 +221,5 @@ public class ImageHelper {
     public static Bitmap toBitmap(@NotNull byte[] byteArray) {
         return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
     }
-//    public Uri getImageUri(Context inContext, Bitmap inImage) {
-//        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-//        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-//        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
-//        return Uri.parse(path);
-//    }
+
 }

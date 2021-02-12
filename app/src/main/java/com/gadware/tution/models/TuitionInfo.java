@@ -10,7 +10,6 @@ public class TuitionInfo {
     private String weeklyDays;
     private String remuneration;
     private String Status;
-    private String ImageUri;
     private String sDate;
     private String eDate;
 
@@ -31,33 +30,9 @@ public class TuitionInfo {
         this.eDate = eDate;
     }
 
-    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status, String imageUri, String sDate, String eDate) {
-        this.id = id;
-        this.studentName = studentName;
-        this.location = location;
-        this.mobile = mobile;
-        this.totalDays = totalDays;
-        this.completedDays = completedDays;
-        this.weeklyDays = weeklyDays;
-        this.remuneration = remuneration;
-        Status = status;
-        ImageUri = imageUri;
-        this.sDate = sDate;
-        this.eDate = eDate;
-    }
 
-    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status, String imageUri) {
-        this.id = id;
-        this.studentName = studentName;
-        this.location = location;
-        this.mobile = mobile;
-        this.totalDays = totalDays;
-        this.completedDays = completedDays;
-        this.weeklyDays = weeklyDays;
-        this.remuneration = remuneration;
-        Status = status;
-        ImageUri = imageUri;
-    }
+
+
 
     public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status) {
         this.id = id;
@@ -143,13 +118,8 @@ public class TuitionInfo {
         Status = status;
     }
 
-    public String getImageUri() {
-        return ImageUri;
-    }
 
-    public void setImageUri(String imageUri) {
-        ImageUri = imageUri;
-    }
+
 
     public String getsDate() {
         return sDate;

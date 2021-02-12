@@ -27,6 +27,12 @@ import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityMainBinding;
 import com.gadware.tution.databinding.TuitionCardBinding;
 import com.gadware.tution.models.TuitionInfo;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -64,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         mUserId = mUser.getUid();
         VerifyUserExistence();
         Showialog();
+        RetriveImage();
         binding.tuitionRecycler.setLayoutManager(new LinearLayoutManager(this));
 
 
@@ -80,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
 
 
         tuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
-        //tuitionInfoRef=FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
         tuitionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -94,6 +100,55 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
+
+
+
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        //adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+
+        MobileAds.initialize(this, initializationStatus -> {
+
+        });
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        binding.adView.loadAd(adRequest);
+
+        binding.adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
+
+
+
 
 
     }
@@ -110,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
             alertDialog.dismiss();
-        }, 3000);
+        }, 3500);
     }
 
     private void RetriveTuitionInfoList() {
@@ -128,11 +183,7 @@ public class MainActivity extends AppCompatActivity {
                         if (dataSnapshot.hasChildren()) {
                             binding.noDataLayout.setVisibility(View.GONE);
                             alertDialog.dismiss();
-//                            if (dataSnapshot.hasChild("ImageUri")) {
-//                                Glide.with(MainActivity.this).load(dataSnapshot.child("ImageUri").getValue().toString()).into(holder.tBinding.ProfileIcon);
-//                            }
-                            //holder.tBinding.ProfileIcon.setImageBitmap(RetriveImage(TuitionIDs,holder.tBinding.ProfileIcon));
-                            RetriveImage(TuitionIDs,holder.tBinding.ProfileIcon);
+                            RetriveImage(TuitionIDs, holder.tBinding.ProfileIcon);
                             String tDAys = dataSnapshot.child("totalDays").getValue().toString();
                             String cDAys = dataSnapshot.child("completedDays").getValue().toString();
                             String wDAys = dataSnapshot.child("weeklyDays").getValue().toString();
@@ -169,8 +220,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public TuitionssViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
                 TuitionCardBinding binding = DataBindingUtil.inflate(LayoutInflater.from(parent.getContext()), R.layout.tuition_card, parent, false);
-                //return new SessionsViewHolder.ViewHolder(binding);
-//                View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.tuition_card, viewGroup,false);
                 TuitionssViewHolder viewHolder = new TuitionssViewHolder(binding);
                 return viewHolder;
 
@@ -231,13 +280,21 @@ public class MainActivity extends AppCompatActivity {
 
     private void RetriveImage(String tuitionId, ImageView view) {
         final long ONE_MEGABYTE = 1024 * 1024;
-        //@SuppressLint("UseCompatLoadingForDrawables") Bitmap bitmap = ImageHelper.drawableToBitmap(getDrawable(R.drawable.ic_baseline_calendar_today_24));
-        Storageref.child(tuitionId+".jpg").getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+        Storageref.child(tuitionId + ".jpg").getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
             byte[] bytes1 = bytes;
-             Bitmap bitmapx=ImageHelper.toBitmap(bytes1);
-             view.setImageBitmap(bitmapx);
+            Bitmap bitmapx = ImageHelper.toBitmap(bytes1);
+            view.setImageBitmap(bitmapx);
         }).addOnFailureListener(exception -> {
-            Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
+        });
+
+    }
+    private void RetriveImage() {
+        final long ONE_MEGABYTE = 1024 * 1024;
+        Storageref.child(mUserId+".jpg").getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+            byte[] bytes1 = bytes;
+            Bitmap bitmap = ImageHelper.toBitmap(bytes1);
+            binding.ProfileIcon.setImageBitmap(bitmap);
+        }).addOnFailureListener(exception -> {
         });
 
     }

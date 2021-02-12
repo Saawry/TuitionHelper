@@ -23,7 +23,7 @@
         <activity android:name=".Activities.SessionDetails" />
         <activity android:name=".Activities.TuitionDetails" />
         <activity android:name=".Activities.AddNewSession" />
-        <activity android:name=".Activities.WeeklySchedule" />
+
         <activity android:name=".Activities.UserProfile" />
         <activity android:name=".Activities.ProfileSetupActivity" />
         <activity android:name=".Activities.SplashActivity">

@@ -1,9 +1,13 @@
 package com.gadware.tution.Activities;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.Toast;
@@ -34,10 +38,11 @@ public class AddNewSession extends AppCompatActivity {
 
 
     ActivityAddNewSessionBinding binding;
+    private AlertDialog alertDialog;
     private final Calendar myCalendar = Calendar.getInstance();
-    private String id, date,  day, time, etime,  topic;
+    private String id, date, day, time, etime, topic;
     int counter;
-    private String userId,tuitionid,completedDays;
+    private String userId, tuitionid, completedDays;
 
 
     @Override
@@ -47,9 +52,9 @@ public class AddNewSession extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
 
 
-        tuitionid=getIntent().getExtras().get("Tuition_id").toString();
-        completedDays=getIntent().getExtras().get("completedDays").toString();
-        counter = Integer.parseInt(completedDays)+1;
+        tuitionid = getIntent().getExtras().get("Tuition_id").toString();
+        completedDays = getIntent().getExtras().get("completedDays").toString();
+        counter = Integer.parseInt(completedDays) + 1;
 
 
         Calendar now = Calendar.getInstance();
@@ -58,14 +63,14 @@ public class AddNewSession extends AppCompatActivity {
         int day = now.get(Calendar.DAY_OF_MONTH);
         int today = now.get(Calendar.DAY_OF_WEEK);
         int hour = now.get(Calendar.HOUR_OF_DAY);
-        int ehour = now.get(Calendar.HOUR_OF_DAY)+1;
+        int ehour = now.get(Calendar.HOUR_OF_DAY) + 1;
         int minte = now.get(Calendar.MINUTE);
         long integerRepresentation = now.getTimeInMillis();
 
-        Calendar cend=Calendar.getInstance();
-        cend.setTimeInMillis(integerRepresentation+3600000);
+        Calendar cend = Calendar.getInstance();
+        cend.setTimeInMillis(integerRepresentation + 3600000);
 
-        userId= FirebaseAuth.getInstance().getUid();
+        userId = FirebaseAuth.getInstance().getUid();
 
         String myTimeFormat = "hh.mm a";
         SimpleDateFormat stf = new SimpleDateFormat(myTimeFormat, Locale.US);
@@ -80,7 +85,7 @@ public class AddNewSession extends AppCompatActivity {
 
 
         binding.inputDate.setOnClickListener(v -> {
-            DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
+            DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (view, year, month, dayOfMonth) -> {
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, month);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -115,7 +120,8 @@ public class AddNewSession extends AppCompatActivity {
         });
 
         binding.addSessionBtnId.setOnClickListener(v -> {
-            if (validate()==1){
+            if (validate() == 1) {
+                ShowLoadingDialog();
                 InsertNewSession();
             }
         });
@@ -123,49 +129,52 @@ public class AddNewSession extends AppCompatActivity {
     }
 
     private void InsertNewSession() {
-        DatabaseReference sessnRef= FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
-        id=sessnRef.getKey();
-        SessionInfo sessionInfo=new SessionInfo(id,date,day,time,etime,topic,String.valueOf(counter));
+        DatabaseReference sessnRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
+        id = sessnRef.getKey();
+        SessionInfo sessionInfo = new SessionInfo(id, date, day, time, etime, topic, String.valueOf(counter));
         sessnRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
             DatabaseReference cntRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(userId).child(tuitionid).getRef();
             cntRef.child("completedDays").setValue(String.valueOf(counter));
+            alertDialog.dismiss();
             Toast.makeText(AddNewSession.this, "Added Successfully", Toast.LENGTH_SHORT).show();
-            Intent intent =new Intent(AddNewSession.this,TuitionDetails.class);
-            intent.putExtra("Tuition_id",tuitionid);
+            Intent intent = new Intent(AddNewSession.this, TuitionDetails.class);
+            intent.putExtra("Tuition_id", tuitionid);
             startActivity(intent);
-        }).addOnFailureListener(e -> Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show());
-
+        }).addOnFailureListener(e -> {
+            alertDialog.dismiss();
+            Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        });
 
     }
 
     private int validate() {
-        date=binding.inputDate.getText().toString();
-        if (date.isEmpty() || date.length()<10){
+        date = binding.inputDate.getText().toString();
+        if (date.isEmpty() || date.length() < 8) {
             binding.inputDate.setError("enter valid date");
             return 0;
         }
 
-        time=binding.inputSTime.getText().toString();
-        if (time.isEmpty() || time.length()<6){
+        time = binding.inputSTime.getText().toString();
+        if (time.isEmpty() || time.length() < 4) {
             binding.inputSTime.setError("enter valid time");
             return 0;
         }
 
-        etime=binding.inputETime.getText().toString();
-        if (etime.isEmpty() || etime.length()<6){
+        etime = binding.inputETime.getText().toString();
+        if (etime.isEmpty() || etime.length() < 4) {
             binding.inputETime.setError("enter valid time");
             return 0;
         }
 
-        day=binding.inputDay.getText().toString();
-        if (date.isEmpty() || date.length()<3){
+        day = binding.inputDay.getText().toString();
+        if (day.isEmpty() || day.length() < 3) {
             binding.inputDay.setError("enter valid day");
             return 0;
         }
 
-        topic=binding.inputTopic.getText().toString();
-        if (topic.isEmpty() || topic.length()<3){
-            binding.inputDate.setError("enter valid topic");
+        topic = binding.inputTopic.getText().toString();
+        if (topic.isEmpty() || topic.length() < 3) {
+            binding.inputTopic.setError("min length 3");
             return 0;
         }
 
@@ -192,4 +201,14 @@ public class AddNewSession extends AppCompatActivity {
         return "";
     }
 
+    private void ShowLoadingDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(AddNewSession.this);
+        LayoutInflater inflater = AddNewSession.this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
+        dialogBuilder.setView(dialogView);
+        alertDialog = dialogBuilder.create();
+        alertDialog.setCancelable(false);
+        alertDialog.show();
+
+    }
 }

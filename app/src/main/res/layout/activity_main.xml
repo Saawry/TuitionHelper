@@ -47,7 +47,7 @@
                     app:cardCornerRadius="30dp"
                     android:padding="2dp">
                     <ImageView
-                        android:scaleType="center"
+                        android:scaleType="fitCenter"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:src="@drawable/ic_baseline_account_circle_24"

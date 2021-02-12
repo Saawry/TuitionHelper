@@ -1,7 +1,7 @@
 package com.gadware.tution.models;
 
 public class User {
-    private String ImageUri,uid,email, password,address, mobile,name;
+    private String uid,email, password,address, mobile,name;
 
     public User() {
     }
@@ -15,24 +15,6 @@ public class User {
         this.name = name;
     }
 
-    public User(String ImageUri, String uid, String email, String password, String address, String mobile, String name) {
-        this.ImageUri = ImageUri;
-        this.uid = uid;
-        this.email = email;
-        this.password = password;
-        this.address = address;
-        this.mobile = mobile;
-        this.name = name;
-    }
-
-
-    public String getImageUrl() {
-        return ImageUri;
-    }
-
-    public void setImageUrl(String imageUrl) {
-        this.ImageUri = imageUrl;
-    }
 
     public String getName() {
         return name;

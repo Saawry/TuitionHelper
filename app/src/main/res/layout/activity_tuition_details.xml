@@ -47,6 +47,7 @@
                 app:cardCornerRadius="70dp">
 
                 <ImageView
+                    android:scaleType="fitCenter"
                     android:id="@+id/tuitionDImg"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -129,6 +130,7 @@
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
+                    android:layout_marginStart="25dp"
                     android:background="@color/teal_700" />
 
                 <LinearLayout
@@ -298,8 +300,8 @@
             android:layout_margin="5dp"
             android:padding="5dp"
             ads:adSize="BANNER"
-            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
-            <!--            ads:adUnitId="ca-app-pub-7098600576446460/4992449955">-->
+            ads:adUnitId="ca-app-pub-7098600576446460/4992449955">
+            <!--            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">-->
         </com.google.android.gms.ads.AdView>
 
     </RelativeLayout>

@@ -66,6 +66,7 @@ import java.util.Objects;
 
 public class TuitionDetails extends AppCompatActivity {
     private AlertDialog alertDialog;
+    private AlertDialog alertDialogx;
     private AlertDialog alert;
 
     private ActivityTuitionDetailsBinding binding;
@@ -84,7 +85,7 @@ public class TuitionDetails extends AppCompatActivity {
 
     private final Calendar myCalendar = Calendar.getInstance();
     private DatabaseReference tuitionRef, sessionRef, tuitionInfoRef;
-    private String mUserId, cTuitionId, completedDays, mobile;
+    private String mUserId, cTuitionId, completedDays,totalDays, mobile;
 
     List<DaySchedule> Schedule = new ArrayList<>();
     List<DaySchedule> NewDaySchedule = new ArrayList<>();
@@ -104,8 +105,8 @@ public class TuitionDetails extends AppCompatActivity {
 
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
-        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
-        //adView.setAdUnitId("ca-app-pub-7098600576446460/4992449955");
+        //adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        adView.setAdUnitId("ca-app-pub-7098600576446460/4992449955");
 
         MobileAds.initialize(this, initializationStatus -> {
 
@@ -165,6 +166,9 @@ public class TuitionDetails extends AppCompatActivity {
             startActivity(nSession);
         });
 
+        binding.tuitionDDTD.setOnClickListener(v -> {
+            GetValueAndUpdate("completedDays",completedDays,"totalDays",totalDays);
+        });
 
         binding.tuitionDMobile.setOnClickListener(v -> {
 
@@ -203,7 +207,7 @@ public class TuitionDetails extends AppCompatActivity {
 
 
         binding.tuitionDSDate.setOnClickListener(v -> {
-            DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
+            DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (view, year, month, dayOfMonth) -> {
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, month);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -218,7 +222,7 @@ public class TuitionDetails extends AppCompatActivity {
 
 
         binding.tuitionDEDate.setOnClickListener(v -> {
-            DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (DatePickerDialog.OnDateSetListener) (view, year, month, dayOfMonth) -> {
+            DatePickerDialog nDate = new DatePickerDialog(this, R.style.datepicker, (view, year, month, dayOfMonth) -> {
                 myCalendar.set(Calendar.YEAR, year);
                 myCalendar.set(Calendar.MONTH, month);
                 myCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -507,13 +511,10 @@ public class TuitionDetails extends AppCompatActivity {
                 binding.tuitionDWD.setText("Weekly " + snapshot.child("weeklyDays").getValue().toString() + " Days");
                 binding.tuitionDRemu.setText(snapshot.child("remuneration").getValue().toString() + " BDT");
 
-                String td = snapshot.child("totalDays").getValue().toString();
+                totalDays = snapshot.child("totalDays").getValue().toString();
                 completedDays = snapshot.child("completedDays").getValue().toString();
-                binding.tuitionDDTD.setText("Completed " + completedDays + " of " + td + " days");
+                binding.tuitionDDTD.setText("Completed " + completedDays + " of " + totalDays + " days");
 
-                if (snapshot.hasChild("ImageUri")) {
-                    Glide.with(TuitionDetails.this).load(snapshot.child("ImageUri").getValue().toString()).into(binding.tuitionDImg);
-                }
                 if (snapshot.hasChild("sDate")) {
                     binding.tuitionDSDate.setText(snapshot.child("sDate").getValue().toString());
                 }
@@ -646,12 +647,16 @@ public class TuitionDetails extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
-            imageUri = data.getData();
-            binding.tuitionDImg.setImageURI(imageUri);
-            ShowLoadingDialog();
-            Bitmap bitmap = ImageHelper.decodeBitmap(this, imageUri, 4900);
-            byte[] bytes = ImageHelper.toByteArray(bitmap);
+            //imageUri = data.getData();
+            Bitmap bitmap=ImageHelper.getImageFromResult(this,RESULT_OK,data);
+
+            Bitmap bitmapx = ImageHelper.generateThumb(bitmap, 4500);
+            binding.tuitionDImg.setImageBitmap(bitmapx);
+
+            alertDialog.show();
+            byte[] bytes = ImageHelper.toByteArray(bitmapx);
             UploadImage(bytes);
+
         }
     }
 
@@ -681,7 +686,6 @@ public class TuitionDetails extends AppCompatActivity {
             if (task.isSuccessful()) {
                 Uri downloadUri = task.getResult();
                 assert downloadUri != null;
-                tuitionInfoRef.child("ImageUri").setValue(downloadUri.toString());
                 alertDialog.dismiss();
             }
         }).addOnFailureListener(e -> alertDialog.dismiss());
@@ -716,6 +720,65 @@ public class TuitionDetails extends AppCompatActivity {
         alert = builder.create();
         alert.setTitle("Delete Session");
         alert.show();
+    }
+
+
+    private void GetValueAndUpdate(String key, String value, String key2, String value2) {
+
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_update_two_value, null);
+        dialogBuilder.setView(dialogView);
+
+        EditText editText = dialogView.findViewById(R.id.dialog_input);
+        EditText editText2 = dialogView.findViewById(R.id.dialog_input2);
+        Button cancelBtn = dialogView.findViewById(R.id.dialog_cancel_btn);
+        Button updateBtn = dialogView.findViewById(R.id.dialog_update_btn);
+        editText.setText(value);
+        editText2.setText(value2);
+
+        cancelBtn.setOnClickListener(v ->
+                alertDialogx.dismiss()
+        );
+
+        updateBtn.setOnClickListener(v -> {
+            String newValue = editText.getText().toString();
+            String newValue2 = editText2.getText().toString();
+            if (!newValue.equals(value)) {
+                if (newValue.isEmpty()) {
+                    editText.setError("Enter valid number");
+                } else {
+                    tuitionInfoRef.child(key).setValue(newValue).addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+                        alertDialogx.dismiss();
+                    }).addOnFailureListener(e -> {
+                                Toast.makeText(TuitionDetails.this, "Couldn't update", Toast.LENGTH_SHORT).show();
+                                alertDialogx.dismiss();
+                            }
+                    );
+                }
+            } else if (!newValue2.equals(value2)) {
+                if (newValue2.isEmpty()) {
+                    editText.setError("Enter valid number");
+                } else {
+                    tuitionInfoRef.child(key2).setValue(newValue2).addOnSuccessListener(aVoid -> {
+                        Toast.makeText(this, "Updated", Toast.LENGTH_SHORT).show();
+                        alertDialogx.dismiss();
+                    }).addOnFailureListener(e -> {
+                                Toast.makeText(TuitionDetails.this, "Couldn't update", Toast.LENGTH_SHORT).show();
+                                alertDialogx.dismiss();
+                            }
+                    );
+                }
+            } else {
+                alertDialogx.dismiss();
+            }
+
+
+        });
+        alertDialogx = dialogBuilder.create();
+        alertDialogx.show();
     }
 }
 
