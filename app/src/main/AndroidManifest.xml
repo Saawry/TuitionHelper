@@ -18,8 +18,9 @@
         android:theme="@style/Theme.TuitionHelper">
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713"/>
-<!--            android:value="ca-app-pub-7098600576446460~7810184984"/>-->
+            android:value="ca-app-pub-7098600576446460~7810184984"/>
+<!--            android:value="ca-app-pub-3940256099942544~3347511713"/>-->
+
         <activity android:name=".Activities.SessionDetails" />
         <activity android:name=".Activities.TuitionDetails" />
         <activity android:name=".Activities.AddNewSession" />

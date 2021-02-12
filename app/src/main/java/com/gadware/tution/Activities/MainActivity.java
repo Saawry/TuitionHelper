@@ -51,11 +51,10 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     private AlertDialog alertDialog;
 
-    private FirebaseDatabase firedb;
     private FirebaseAuth mAuth;
     private FirebaseUser mUser;
     private DatabaseReference tuitionRef;
-    private String status = "", mUserId;
+    private String  mUserId;
     StorageReference Storageref;
 
     @Override
@@ -66,9 +65,18 @@ public class MainActivity extends AppCompatActivity {
         Storageref = FirebaseStorage.getInstance().getReference("Images");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
-        firedb = FirebaseDatabase.getInstance();
-        mUserId = mUser.getUid();
-        VerifyUserExistence();
+
+        if (mUser!=null){
+            mUserId = mUser.getUid();
+            if (mUserId.isEmpty()){
+                mAuth.signOut();
+                startActivity(new Intent(this, LoginActivity.class));
+                finish();
+                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+            }
+        }
+
+
         Showialog();
         RetriveImage();
         binding.tuitionRecycler.setLayoutManager(new LinearLayoutManager(this));
@@ -77,12 +85,17 @@ public class MainActivity extends AppCompatActivity {
         binding.ProfileIcon.setOnClickListener(v -> {
 
                     startActivity(new Intent(MainActivity.this, UserProfile.class));
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 }
         );
 
-        binding.favAddNewTuitionBtn.setOnClickListener(v ->
+        binding.favAddNewTuitionBtn.setOnClickListener(v -> {
+                    startActivity(new Intent(MainActivity.this, AddNewTuition.class));
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                }
 
-                startActivity(new Intent(MainActivity.this, AddNewTuition.class))
+
+
         );
 
 
@@ -102,13 +115,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
-
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
-        //adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
-        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        //adView.setAdUnitId("ca-app-pub-7098600576446460/6289073964");
+        adView.setAdUnitId("ca-app-pub-7098600576446460/6289073964");
 
         MobileAds.initialize(this, initializationStatus -> {
 
@@ -145,10 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 // to the app after tapping on an ad.
             }
         });
-
-
-
-
 
 
     }
@@ -197,12 +203,14 @@ public class MainActivity extends AppCompatActivity {
                                 Intent tdIntent = new Intent(MainActivity.this, TuitionDetails.class);
                                 tdIntent.putExtra("Tuition_id", TuitionIDs);
                                 startActivity(tdIntent);
+                                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                             });
                             holder.tBinding.addNewSessionIcon.setOnClickListener(v -> {
                                 Intent tdIntent = new Intent(MainActivity.this, AddNewSession.class);
                                 tdIntent.putExtra("Tuition_id", TuitionIDs);
                                 tdIntent.putExtra("completedDays", cDAys);
                                 startActivity(tdIntent);
+                                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                             });
 
                         }
@@ -235,32 +243,34 @@ public class MainActivity extends AppCompatActivity {
         if (mUser == null) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         } else {
-
-            String activeUserId = mUser.getUid();
-            try {
-                DatabaseReference ref = firedb.getReference().child("Users").child(activeUserId).child("UserInfo").child("status");
-                ref.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        if (snapshot.hasChildren()) {
-                            status = Objects.requireNonNull(snapshot.getValue()).toString();
-                            if (status.equals("noImage")) {
-                                Toast.makeText(MainActivity.this, "No Profile Image", Toast.LENGTH_SHORT).show();
-//                                startActivity(new Intent(MainActivity.this, UserProfile.class));
-//                                finish();
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            } catch (Exception e) {
-                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            }
+            RetriveImage();
+//            String activeUserId = mUser.getUid();
+//            try {
+//                DatabaseReference ref = firedb.getReference().child("Users").child(activeUserId).child("UserInfo").child("status");
+//                ref.addListenerForSingleValueEvent(new ValueEventListener() {
+//                    @Override
+//                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                        if (snapshot.hasChildren()) {
+//                            status = Objects.requireNonNull(snapshot.getValue()).toString();
+//                            if (status.equals("noImage")) {
+//                                Toast.makeText(MainActivity.this, "No Profile Image", Toast.LENGTH_SHORT).show();
+////                                startActivity(new Intent(MainActivity.this, UserProfile.class));
+////                                finish();
+//                                //overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+//                            }
+//                        }
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError error) {
+//
+//                    }
+//                });
+//            } catch (Exception e) {
+//                Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
 
 
         }
@@ -288,14 +298,22 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
     private void RetriveImage() {
         final long ONE_MEGABYTE = 1024 * 1024;
-        Storageref.child(mUserId+".jpg").getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+        Storageref.child(mUserId + ".jpg").getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
             byte[] bytes1 = bytes;
             Bitmap bitmap = ImageHelper.toBitmap(bytes1);
             binding.ProfileIcon.setImageBitmap(bitmap);
         }).addOnFailureListener(exception -> {
         });
 
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        VerifyUserExistence();
     }
 }

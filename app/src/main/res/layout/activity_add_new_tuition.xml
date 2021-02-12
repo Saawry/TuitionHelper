@@ -55,7 +55,7 @@
                             android:id="@+id/input_location"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Locaton"
+                            android:hint="Location"
                             android:inputType="textPostalAddress" />
                     </com.google.android.material.textfield.TextInputLayout>
 
@@ -147,6 +147,19 @@
                         android:textColor="@color/white" />
 
             </LinearLayout>
+        <com.google.android.gms.ads.AdView
+            xmlns:ads="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/adView"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_margin="5dp"
+            android:padding="5dp"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            ads:adSize="BANNER"
+            ads:adUnitId="ca-app-pub-7098600576446460/2003905092">
+            <!--            ads:adUnitId="ca-app-pub-7098600576446460/2003905092">-->
+        </com.google.android.gms.ads.AdView>
         </RelativeLayout>
 
 

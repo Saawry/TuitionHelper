@@ -1,6 +1,7 @@
 package com.gadware.tution.Activities;
 
 import android.app.AlertDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,12 +21,24 @@ import com.gadware.tution.R;
 import com.gadware.tution.databinding.ActivityAddNewTuitionBinding;
 import com.gadware.tution.models.DaySchedule;
 import com.gadware.tution.models.TuitionInfo;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 
 public class AddNewTuition extends AppCompatActivity {
 
@@ -33,6 +47,7 @@ public class AddNewTuition extends AppCompatActivity {
     private AlertDialog alertDialog;
     private DatabaseReference TuitionRef;
     private String mUserId;
+    private long tuitionCounter=0;
 
     List<DaySchedule> daySchedules = new ArrayList<>();
 
@@ -42,13 +57,82 @@ public class AddNewTuition extends AppCompatActivity {
         setContentView(R.layout.activity_add_new_tuition);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_tuition);
 
+        mUserId=FirebaseAuth.getInstance().getUid();
+
+        TuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
+
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        //adView.setAdUnitId("ca-app-pub-7098600576446460/2003905092");
+        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+
+        MobileAds.initialize(this, initializationStatus -> {
+
+        });
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        binding.adView.loadAd(adRequest);
+
+        binding.adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
+
+        GetTuitionCounter();
+
         binding.inputWeeklyDays.setOnClickListener(v -> {
             getWeeklySchedule();
         });
 
         binding.addTuitionBtnId.setOnClickListener(v -> {
-            if (validate() == 1) {
+            if (tuitionCounter >= 10) {
+                Toast.makeText(AddNewTuition.this, "Reached Maximum(10), delete old tuition to add new one", Toast.LENGTH_LONG).show();
+            } else if (validate() == 1) {
                 InitNewTuition();
+            }
+        });
+
+    }
+
+    private void GetTuitionCounter() {
+        TuitionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                tuitionCounter = dataSnapshot.getChildrenCount();
+
+                if (tuitionCounter >= 10) {
+                    Toast.makeText(AddNewTuition.this, "Reached Maximum(10), delete old tuition to add new one", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 
@@ -62,13 +146,13 @@ public class AddNewTuition extends AppCompatActivity {
         View dialogView = inflater.inflate(R.layout.weekly_days_select, null);
         dialogBuilder.setView(dialogView);
 
-        EditText satEt = dialogView.findViewById(R.id.satTimeET);
-        EditText sunEt = dialogView.findViewById(R.id.sunTimeET);
-        EditText monEt = dialogView.findViewById(R.id.monTimeET);
-        EditText tueEt = dialogView.findViewById(R.id.tueTimeET);
-        EditText wedEt = dialogView.findViewById(R.id.wedTimeET);
-        EditText thuEt = dialogView.findViewById(R.id.thuTimeET);
-        EditText friEt = dialogView.findViewById(R.id.friTimeET);
+        TextView satEt = dialogView.findViewById(R.id.satTimeET);
+        TextView sunEt = dialogView.findViewById(R.id.sunTimeET);
+        TextView monEt = dialogView.findViewById(R.id.monTimeET);
+        TextView tueEt = dialogView.findViewById(R.id.tueTimeET);
+        TextView wedEt = dialogView.findViewById(R.id.wedTimeET);
+        TextView thuEt = dialogView.findViewById(R.id.thuTimeET);
+        TextView friEt = dialogView.findViewById(R.id.friTimeET);
 
         CheckBox satCB = dialogView.findViewById(R.id.satcheckBox);
         CheckBox sunCB = dialogView.findViewById(R.id.suncheckBox);
@@ -153,9 +237,10 @@ public class AddNewTuition extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void HideViewEditText(EditText Et, boolean isChecked) {
+    private void HideViewEditText(TextView Et, boolean isChecked) {
         if (isChecked) {
             Et.setVisibility(View.VISIBLE);
+            ShowClock(Et);
         } else {
             Et.setText("");
             Et.setVisibility(View.GONE);
@@ -163,13 +248,11 @@ public class AddNewTuition extends AppCompatActivity {
     }
 
     private void InitNewTuition() {
-        mUserId = FirebaseAuth.getInstance().getUid();
-        TuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId).push();
-        id = TuitionRef.getKey();
+
+        id = TuitionRef.push().getKey();
         TuitionInfo tuitionInfo = new TuitionInfo(id, studentName, location, mobile, totalDays, completedDays, weeklyDays, remuneration, "Active");
         TuitionRef.setValue(tuitionInfo).addOnSuccessListener(aVoid -> {
-//            UserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mUserId).child("TuitionList").child(id);
-//            UserRef.setValue("Active");
+
             AddSchedules(id);
 
         }).addOnFailureListener(e -> Toast.makeText(AddNewTuition.this, e.getMessage(), Toast.LENGTH_SHORT).show());
@@ -177,11 +260,12 @@ public class AddNewTuition extends AppCompatActivity {
     }
 
     private void AddSchedules(String id) {
-        for (DaySchedule daySchedule:daySchedules){
-          DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id);
-          ScheduleRef.child(daySchedule.getDayName()).setValue(daySchedule.getTime());
+        for (DaySchedule daySchedule : daySchedules) {
+            DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id);
+            ScheduleRef.child(daySchedule.getDayName()).setValue(daySchedule.getTime());
         }
         startActivity(new Intent(this, MainActivity.class));
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
     public int validate() {
@@ -245,7 +329,27 @@ public class AddNewTuition extends AppCompatActivity {
             binding.inputRemuneration.setError(null);
         }
 
-
         return 1;
     }
+
+    private void ShowClock(TextView editText){
+        Calendar myCalendar = Calendar.getInstance();
+        String myTimeFormat = "hh.mm a";
+
+        SimpleDateFormat stf = new SimpleDateFormat(myTimeFormat, Locale.US);
+        Calendar now = Calendar.getInstance();
+
+        int hour = now.get(Calendar.HOUR_OF_DAY);
+        int minte = now.get(Calendar.MINUTE);
+
+        TimePickerDialog nTime = new TimePickerDialog(this, R.style.datepicker, (view, hourOfDay, minute) -> {
+            myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            myCalendar.set(Calendar.MINUTE, minute);
+
+
+            editText.setText(stf.format(myCalendar.getTime()));
+        }, hour, minte, false);
+        nTime.show();
+    }
+
 }

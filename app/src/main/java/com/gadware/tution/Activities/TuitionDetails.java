@@ -12,6 +12,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -29,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -164,6 +166,7 @@ public class TuitionDetails extends AppCompatActivity {
             nSession.putExtra("Tuition_id", cTuitionId);
             nSession.putExtra("completedDays", completedDays);
             startActivity(nSession);
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         });
 
         binding.tuitionDDTD.setOnClickListener(v -> {
@@ -253,6 +256,7 @@ public class TuitionDetails extends AppCompatActivity {
                     Toast.makeText(this, "Deleted Successfully", Toast.LENGTH_SHORT).show();
                     startActivity(new Intent(this, MainActivity.class));
                     finish();
+                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                 }).addOnFailureListener(e -> {
                     alertDialog.dismiss();
                     Toast.makeText(this, "Couldn't Delete", Toast.LENGTH_SHORT).show();
@@ -276,13 +280,13 @@ public class TuitionDetails extends AppCompatActivity {
         View dialogView = inflater.inflate(R.layout.weekly_days_select, null);
         dialogBuilder.setView(dialogView);
 
-        EditText satEt = dialogView.findViewById(R.id.satTimeET);
-        EditText sunEt = dialogView.findViewById(R.id.sunTimeET);
-        EditText monEt = dialogView.findViewById(R.id.monTimeET);
-        EditText tueEt = dialogView.findViewById(R.id.tueTimeET);
-        EditText wedEt = dialogView.findViewById(R.id.wedTimeET);
-        EditText thuEt = dialogView.findViewById(R.id.thuTimeET);
-        EditText friEt = dialogView.findViewById(R.id.friTimeET);
+        TextView satEt = dialogView.findViewById(R.id.satTimeET);
+        TextView sunEt = dialogView.findViewById(R.id.sunTimeET);
+        TextView monEt = dialogView.findViewById(R.id.monTimeET);
+        TextView tueEt = dialogView.findViewById(R.id.tueTimeET);
+        TextView wedEt = dialogView.findViewById(R.id.wedTimeET);
+        TextView thuEt = dialogView.findViewById(R.id.thuTimeET);
+        TextView friEt = dialogView.findViewById(R.id.friTimeET);
 
         CheckBox satCB = dialogView.findViewById(R.id.satcheckBox);
         CheckBox sunCB = dialogView.findViewById(R.id.suncheckBox);
@@ -416,9 +420,10 @@ public class TuitionDetails extends AppCompatActivity {
     }
 
 
-    private void HideViewEditText(EditText Et, boolean isChecked) {
+    private void HideViewEditText(TextView Et, boolean isChecked) {
         if (isChecked) {
             Et.setVisibility(View.VISIBLE);
+            ShowClock(Et);
         } else {
             Et.setText("");
             Et.setVisibility(View.GONE);
@@ -575,6 +580,7 @@ public class TuitionDetails extends AppCompatActivity {
                                 intent.putExtra("sessionId", SessionIDs);
                                 intent.putExtra("tuitionId", cTuitionId);
                                 startActivity(intent);
+                                overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                             });
 
                             new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
@@ -779,6 +785,31 @@ public class TuitionDetails extends AppCompatActivity {
         });
         alertDialogx = dialogBuilder.create();
         alertDialogx.show();
+    }
+    private void ShowClock(TextView editText){
+        Calendar myCalendar = Calendar.getInstance();
+        String myTimeFormat = "hh.mm a";
+
+        SimpleDateFormat stf = new SimpleDateFormat(myTimeFormat, Locale.US);
+        Calendar now = Calendar.getInstance();
+
+        int hour = now.get(Calendar.HOUR_OF_DAY);
+        int minte = now.get(Calendar.MINUTE);
+
+        TimePickerDialog nTime = new TimePickerDialog(this, R.style.datepicker, (view, hourOfDay, minute) -> {
+            myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            myCalendar.set(Calendar.MINUTE, minute);
+
+
+            editText.setText(stf.format(myCalendar.getTime()));
+        }, hour, minte, false);
+        nTime.show();
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(this,MainActivity.class));
+        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 }
 

@@ -30,6 +30,12 @@ import com.gadware.tution.Activities.LoginActivity;
 import com.gadware.tution.R;
 import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityUserProfileBinding;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.LoadAdError;
+import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -62,7 +68,7 @@ public class UserProfile extends AppCompatActivity {
     };
 
     private static final int PICK_IMAGE = 100;
-    Uri imageUri;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +77,56 @@ public class UserProfile extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
 
         muserId = FirebaseAuth.getInstance().getUid();
+
+
+
+
+
+
+        AdView adView = new AdView(this);
+        adView.setAdSize(AdSize.BANNER);
+        //adView.setAdUnitId("ca-app-pub-7098600576446460/8504173760");
+        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+
+        MobileAds.initialize(this, initializationStatus -> {
+
+        });
+
+        AdRequest adRequest = new AdRequest.Builder().build();
+        binding.adView.loadAd(adRequest);
+
+        binding.adView.setAdListener(new AdListener() {
+            @Override
+            public void onAdLoaded() {
+                // Code to be executed when an ad finishes loading.
+            }
+
+            @Override
+            public void onAdFailedToLoad(LoadAdError adError) {
+                // Code to be executed when an ad request fails.
+            }
+
+            @Override
+            public void onAdOpened() {
+                // Code to be executed when an ad opens an overlay that
+                // covers the screen.
+            }
+
+            @Override
+            public void onAdClicked() {
+                // Code to be executed when the user clicks on an ad.
+            }
+
+            @Override
+            public void onAdClosed() {
+                // Code to be executed when the user is about to return
+                // to the app after tapping on an ad.
+            }
+        });
+
+
+
+
         Storageref = FirebaseStorage.getInstance().getReference("Images").child(muserId + ".jpg");
         userInfoRef = FirebaseDatabase.getInstance().getReference("Users").child(muserId).child("UserInfo");
         Showialog();
@@ -107,8 +163,25 @@ public class UserProfile extends AppCompatActivity {
         binding.signoutBtn.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(this, LoginActivity.class));
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         });
 
+        binding.deleteAccBtn.setOnClickListener(v -> {
+            //show delete confirm dialog
+            Showialog();
+            DeleteAccount();
+        });
+
+    }
+
+    private void DeleteAccount() {
+        //get tuition list and delete
+        //get session for all tuition and delete
+        //get Schedule for all tuition and delete
+        //delete all tuition images
+        //delete user info
+        //delete user Image
+        //delete authentication account
     }
 
     private void RetriveUserImage() {

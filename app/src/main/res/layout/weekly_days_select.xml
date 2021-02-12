@@ -41,10 +41,11 @@
             android:layout_height="match_parent"
             android:text="Saturday" />
 
-        <EditText
+        <TextView
             android:hint="00.00 am"
             android:id="@+id/satTimeET"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
@@ -65,10 +66,11 @@
             android:layout_height="match_parent"
             android:text="Sunday" />
 
-        <EditText
+        <TextView
             android:hint="00.00 am"
             android:id="@+id/sunTimeET"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
@@ -89,10 +91,11 @@
             android:layout_height="match_parent"
             android:text="Monday" />
 
-        <EditText
+        <TextView
             android:hint="00.00 am"
             android:id="@+id/monTimeET"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
@@ -113,10 +116,11 @@
             android:layout_height="match_parent"
             android:text="Tuesday" />
 
-        <EditText
+        <TextView
             android:hint="00.00 am"
             android:id="@+id/tueTimeET"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
@@ -137,10 +141,11 @@
             android:layout_height="match_parent"
             android:text="Wednesday" />
 
-        <EditText
+        <TextView
             android:hint="00.00 am"
             android:id="@+id/wedTimeET"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
@@ -161,10 +166,11 @@
             android:layout_height="match_parent"
             android:text="Thursday" />
 
-        <EditText
+        <TextView
             android:hint="00.00 am"
             android:id="@+id/thuTimeET"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 
@@ -185,10 +191,11 @@
             android:layout_height="match_parent"
             android:text="Friday" />
 
-        <EditText
+        <TextView
             android:hint="00.00 am"
             android:id="@+id/friTimeET"
-            android:layout_width="150dp"
+            android:layout_width="110dp"
+            android:textAlignment="center"
             android:layout_height="wrap_content"
             android:visibility="gone" />
 

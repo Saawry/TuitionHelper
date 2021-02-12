@@ -71,6 +71,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
                             Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(ProfileSetupActivity.this, MainActivity.class));
                             finish();
+                            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         }).addOnFailureListener(e -> {
                             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         });

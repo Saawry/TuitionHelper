@@ -1,14 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="200dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_gravity="center"
     android:gravity="center"
-    android:background="@android:color/transparent"
     android:layout_height="wrap_content">
-    <pl.droidsonroids.gif.GifImageView
-        android:gravity="center"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:src="@drawable/loading_gif"
-        />
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="7dp"
+        android:background="@android:color/holo_red_light">
+
+        <LinearLayout
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <pl.droidsonroids.gif.GifImageView
+                android:gravity="center"
+                android:padding="10dp"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/loading_gif"
+                />
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
 </LinearLayout>
