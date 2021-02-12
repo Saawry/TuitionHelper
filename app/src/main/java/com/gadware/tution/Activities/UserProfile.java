@@ -9,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.gadware.tution.Activities.LoginActivity;
 import com.gadware.tution.R;
+import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityUserProfileBinding;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -63,10 +65,11 @@ public class UserProfile extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
 
         muserId = FirebaseAuth.getInstance().getUid();
-        Storageref = FirebaseStorage.getInstance().getReference("Images");
+        Storageref = FirebaseStorage.getInstance().getReference("Images").child(muserId+".jpg");
         userInfoRef = FirebaseDatabase.getInstance().getReference("Users").child(muserId).child("UserInfo");
         Showialog();
         RetrieveUserInfo();
+        RetriveUserImage();
         binding.userImageIV.setOnClickListener(v -> {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -82,16 +85,16 @@ public class UserProfile extends AppCompatActivity {
         });
 
         binding.inputName.setOnClickListener(v -> {
-            GetValueAndUpdate(binding.inputName,"name",binding.inputName.getText().toString());
+            GetValueAndUpdate("name",binding.inputName.getText().toString());
         });
         binding.inputEmail.setOnClickListener(v -> {
-            GetValueAndUpdate(binding.inputEmail,"email",binding.inputEmail.getText().toString());
+            GetValueAndUpdate("email",binding.inputEmail.getText().toString());
         });
         binding.inputMobile.setOnClickListener(v -> {
-            GetValueAndUpdate(binding.inputMobile,"mobile",binding.inputMobile.getText().toString());
+            GetValueAndUpdate("mobile",binding.inputMobile.getText().toString());
         });
         binding.inputAddress.setOnClickListener(v -> {
-            GetValueAndUpdate(binding.inputAddress,"address",binding.inputAddress.getText().toString());
+            GetValueAndUpdate("address",binding.inputAddress.getText().toString());
         });
 
 
@@ -105,18 +108,31 @@ public class UserProfile extends AppCompatActivity {
 
     }
 
+    private void RetriveUserImage() {
+        final long ONE_MEGABYTE = 1024 * 1024;
+        Storageref.getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+            byte[]bytes1=bytes;
+            Bitmap bitmap=ImageHelper.toBitmap(bytes1);
+            binding.userImageIV.setImageBitmap(bitmap);
+        }).addOnFailureListener(exception -> {
+            Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
+        });
+
+    }
+
     private void RetrieveUserInfo() {
         userInfoRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 alertDialog.dismiss();
-                if (snapshot.child("ImageUri").exists()) {
+//                if (snapshot.child("ImageUri").exists()) {
+//                    Glide.with(UserProfile.this).load(Objects.requireNonNull(snapshot.child("ImageUri").getValue()).toString()).into(binding.userImageIV);
+//                }
 
-                    Glide.with(UserProfile.this).load(Objects.requireNonNull(snapshot.child("ImageUri").getValue()).toString()).into(binding.userImageIV);
-
-                }
-
-                //initFields
+                binding.inputName.setText(snapshot.child("name").getValue().toString());
+                binding.inputMobile.setText(snapshot.child("mobile").getValue().toString());
+                binding.inputEmail.setText(snapshot.child("email").getValue().toString());
+                binding.inputAddress.setText(snapshot.child("address").getValue().toString());
             }
 
             @Override
@@ -159,14 +175,16 @@ public class UserProfile extends AppCompatActivity {
             imageUri = data.getData();
             binding.userImageIV.setImageURI(imageUri);
             alertDialog.show();
-            UploadImage(imageUri);
+            Bitmap bitmap= ImageHelper.decodeBitmap(this,imageUri,28900);
+            byte[] bytes=ImageHelper.toByteArray(bitmap);
+            UploadImage(bytes);
         }
     }
 
-    private void UploadImage(Uri imageUri) {
+    private void UploadImage(byte[] imageUri) {
 
-        final StorageReference ref = Storageref.child(muserId + ".jpg");
-        UploadTask uploadTask = ref.putFile(imageUri);
+        final StorageReference ref = Storageref;
+        UploadTask uploadTask = ref.putBytes(imageUri);
 
         uploadTask.continueWithTask(task -> {
             if (!task.isSuccessful()) {
@@ -200,7 +218,7 @@ public class UserProfile extends AppCompatActivity {
 
 
 
-    private void GetValueAndUpdate(TextView tv, String key,String value) {
+    private void GetValueAndUpdate( String key,String value) {
 
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
@@ -235,6 +253,7 @@ public class UserProfile extends AppCompatActivity {
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
     }
+
 
 
 }

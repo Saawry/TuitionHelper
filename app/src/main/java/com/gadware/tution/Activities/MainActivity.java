@@ -6,21 +6,24 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.gadware.tution.R;
+import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityMainBinding;
 import com.gadware.tution.databinding.TuitionCardBinding;
 import com.gadware.tution.models.TuitionInfo;
@@ -31,8 +34,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -44,13 +50,14 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser mUser;
     private DatabaseReference tuitionRef;
     private String status = "", mUserId;
+    StorageReference Storageref;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
+        Storageref = FirebaseStorage.getInstance().getReference("Images");
         mAuth = FirebaseAuth.getInstance();
         mUser = mAuth.getCurrentUser();
         firedb = FirebaseDatabase.getInstance();
@@ -107,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void RetriveTuitionInfoList() {
-        FirebaseRecyclerOptions options = new FirebaseRecyclerOptions.Builder<TuitionInfo>().setQuery(tuitionRef, TuitionInfo.class).build();
+        FirebaseRecyclerOptions<TuitionInfo> options = new FirebaseRecyclerOptions.Builder<TuitionInfo>().setQuery(tuitionRef, TuitionInfo.class).build();
 
         final FirebaseRecyclerAdapter<TuitionInfo, TuitionssViewHolder> adapter
                 = new FirebaseRecyclerAdapter<TuitionInfo, TuitionssViewHolder>(options) {
@@ -121,10 +128,11 @@ public class MainActivity extends AppCompatActivity {
                         if (dataSnapshot.hasChildren()) {
                             binding.noDataLayout.setVisibility(View.GONE);
                             alertDialog.dismiss();
-                            if (dataSnapshot.hasChild("ImageUri")) {
-                                Glide.with(MainActivity.this).load(dataSnapshot.child("ImageUri").getValue().toString()).into(holder.tBinding.ProfileIcon);
-                            }
-
+//                            if (dataSnapshot.hasChild("ImageUri")) {
+//                                Glide.with(MainActivity.this).load(dataSnapshot.child("ImageUri").getValue().toString()).into(holder.tBinding.ProfileIcon);
+//                            }
+                            //holder.tBinding.ProfileIcon.setImageBitmap(RetriveImage(TuitionIDs,holder.tBinding.ProfileIcon));
+                            RetriveImage(TuitionIDs,holder.tBinding.ProfileIcon);
                             String tDAys = dataSnapshot.child("totalDays").getValue().toString();
                             String cDAys = dataSnapshot.child("completedDays").getValue().toString();
                             String wDAys = dataSnapshot.child("weeklyDays").getValue().toString();
@@ -139,6 +147,13 @@ public class MainActivity extends AppCompatActivity {
                                 tdIntent.putExtra("Tuition_id", TuitionIDs);
                                 startActivity(tdIntent);
                             });
+                            holder.tBinding.addNewSessionIcon.setOnClickListener(v -> {
+                                Intent tdIntent = new Intent(MainActivity.this, AddNewSession.class);
+                                tdIntent.putExtra("Tuition_id", TuitionIDs);
+                                tdIntent.putExtra("completedDays", cDAys);
+                                startActivity(tdIntent);
+                            });
+
                         }
 
                     }
@@ -211,5 +226,19 @@ public class MainActivity extends AppCompatActivity {
             this.tBinding = tBinding;
 
         }
+    }
+
+
+    private void RetriveImage(String tuitionId, ImageView view) {
+        final long ONE_MEGABYTE = 1024 * 1024;
+        //@SuppressLint("UseCompatLoadingForDrawables") Bitmap bitmap = ImageHelper.drawableToBitmap(getDrawable(R.drawable.ic_baseline_calendar_today_24));
+        Storageref.child(tuitionId+".jpg").getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+            byte[] bytes1 = bytes;
+             Bitmap bitmapx=ImageHelper.toBitmap(bytes1);
+             view.setImageBitmap(bitmapx);
+        }).addOnFailureListener(exception -> {
+            Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
+        });
+
     }
 }

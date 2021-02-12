@@ -46,7 +46,7 @@ public class SplashActivity extends AppCompatActivity {
         }
     }
 
-
+@SuppressWarnings("deprecation")
     private void hideSystemUI2() {
 
         View decorView = getWindow().getDecorView();

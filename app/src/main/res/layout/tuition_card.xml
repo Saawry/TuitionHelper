@@ -31,7 +31,7 @@
             </androidx.cardview.widget.CardView>
 
             <LinearLayout
-                android:layout_weight="4.1"
+                android:layout_weight="3.5"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -48,6 +48,7 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
+                        android:textAlignment="center"
                         android:text="Tuition Title"
                         android:textSize="20dp" />
 
@@ -87,14 +88,15 @@
                         android:textAlignment="center"
                         android:textSize="16dp" />
                 </LinearLayout>
+
             </LinearLayout>
-<ImageView
-    android:padding="5dp"
-    android:layout_width="0dp"
-    android:layout_weight="1"
-    android:layout_height="match_parent"
-    android:src="@drawable/ic_baseline_add_circle_outline_24"
-    android:id="@+id/addNewSessionImg"/>
+            <ImageView
+                android:padding="5dp"
+                android:layout_width="0dp"
+                android:layout_weight=".6"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_baseline_add_circle_outline_24"
+                android:id="@+id/addNewSessionIcon"/>
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 

@@ -9,16 +9,19 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +35,7 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.gadware.tution.R;
+import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityTuitionDetailsBinding;
 import com.gadware.tution.databinding.SessionCardBinding;
 import com.gadware.tution.models.DaySchedule;
@@ -52,6 +56,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -61,7 +66,7 @@ import java.util.Objects;
 
 public class TuitionDetails extends AppCompatActivity {
     private AlertDialog alertDialog;
-    private  AlertDialog alert;
+    private AlertDialog alert;
 
     private ActivityTuitionDetailsBinding binding;
 
@@ -79,7 +84,7 @@ public class TuitionDetails extends AppCompatActivity {
 
     private final Calendar myCalendar = Calendar.getInstance();
     private DatabaseReference tuitionRef, sessionRef, tuitionInfoRef;
-    private String mUserId, cTuitionId, completedDays,mobile;
+    private String mUserId, cTuitionId, completedDays, mobile;
 
     List<DaySchedule> Schedule = new ArrayList<>();
     List<DaySchedule> NewDaySchedule = new ArrayList<>();
@@ -132,18 +137,13 @@ public class TuitionDetails extends AppCompatActivity {
             }
 
             @Override
-            public void onAdLeftApplication() {
-                // Code to be executed when the user has left the app.
-            }
-
-            @Override
             public void onAdClosed() {
                 // Code to be executed when the user is about to return
                 // to the app after tapping on an ad.
             }
         });
 
-        Storageref = FirebaseStorage.getInstance().getReference("Images");
+        Storageref = FirebaseStorage.getInstance().getReference("Images").child(cTuitionId + ".jpg");
         tuitionInfoRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId);
         sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(cTuitionId);
 
@@ -151,10 +151,10 @@ public class TuitionDetails extends AppCompatActivity {
         RetriveTuitionInfo();
         RetriveScheduleInfo();
         RetriveSessionInfoList();
-
+        RetriveImage();
         Calendar now = Calendar.getInstance();
         int yr = now.get(Calendar.YEAR);
-        int mnth = now.get(Calendar.MONTH); // Note: result may zero based!(+1)
+        int mnth = now.get(Calendar.MONTH);
         int day = now.get(Calendar.DAY_OF_MONTH);
         String myDateFormat = "dd.MM.yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(myDateFormat, Locale.US);
@@ -173,15 +173,15 @@ public class TuitionDetails extends AppCompatActivity {
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (ActivityCompat.checkSelfPermission(TuitionDetails.this,
-                        Manifest.permission.CALL_PHONE) != PackageManager.PERMISSION_GRANTED) {
-                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1);
-                    return;
+                        Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    startActivity(i);
+                } else {
+                    requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 99);
                 }
             }
             startActivity(i);
 
         });
-
 
 
         binding.tuitionDImg.setOnClickListener(v -> {
@@ -503,9 +503,9 @@ public class TuitionDetails extends AppCompatActivity {
                 binding.tuitionDSName.setText(snapshot.child("studentName").getValue().toString());
                 binding.tuitionDLocation.setText(snapshot.child("location").getValue().toString());
                 binding.tuitionDMobile.setText(snapshot.child("mobile").getValue().toString());
-                mobile=snapshot.child("mobile").getValue().toString();
+                mobile = snapshot.child("mobile").getValue().toString();
                 binding.tuitionDWD.setText("Weekly " + snapshot.child("weeklyDays").getValue().toString() + " Days");
-                binding.tuitionDRemu.setText(snapshot.child("remuneration").getValue().toString()+" BDT");
+                binding.tuitionDRemu.setText(snapshot.child("remuneration").getValue().toString() + " BDT");
 
                 String td = snapshot.child("totalDays").getValue().toString();
                 completedDays = snapshot.child("completedDays").getValue().toString();
@@ -525,7 +525,9 @@ public class TuitionDetails extends AppCompatActivity {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {alertDialog.dismiss(); }
+            public void onCancelled(@NonNull DatabaseError error) {
+                alertDialog.dismiss();
+            }
         });
 
 
@@ -567,12 +569,12 @@ public class TuitionDetails extends AppCompatActivity {
                             holder.sBinding.sessionCardTpc.setText("Topic: " + dataSnapshot.child("topic").getValue().toString());
 
 
-                        holder.itemView.setOnClickListener(v -> {
-                            Intent intent = new Intent(TuitionDetails.this, SessionDetails.class);
-                            intent.putExtra("sessionId", SessionIDs);
-                            intent.putExtra("tuitionId", cTuitionId);
-                            startActivity(intent);
-                        });
+                            holder.itemView.setOnClickListener(v -> {
+                                Intent intent = new Intent(TuitionDetails.this, SessionDetails.class);
+                                intent.putExtra("sessionId", SessionIDs);
+                                intent.putExtra("tuitionId", cTuitionId);
+                                startActivity(intent);
+                            });
 
                             new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                                     ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
@@ -593,7 +595,7 @@ public class TuitionDetails extends AppCompatActivity {
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
                         alertDialog.dismiss();
-                        Toast.makeText(TuitionDetails.this,"Database Error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TuitionDetails.this, "Database Error", Toast.LENGTH_SHORT).show();
                     }
                 });
             }
@@ -627,10 +629,11 @@ public class TuitionDetails extends AppCompatActivity {
 
     }
 
+    @SuppressLint("IntentReset")
     private void openGallery() {
         Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
         getIntent.setType("image/*");
-        Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        @SuppressLint("IntentReset") Intent pickIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         pickIntent.setType("image/*");
 
         Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
@@ -646,14 +649,28 @@ public class TuitionDetails extends AppCompatActivity {
             imageUri = data.getData();
             binding.tuitionDImg.setImageURI(imageUri);
             ShowLoadingDialog();
-            UploadImage(imageUri);
+            Bitmap bitmap = ImageHelper.decodeBitmap(this, imageUri, 4900);
+            byte[] bytes = ImageHelper.toByteArray(bitmap);
+            UploadImage(bytes);
         }
     }
 
-    private void UploadImage(Uri imageUri) {
+    private void RetriveImage() {
+        final long ONE_MEGABYTE = 1024 * 1024;
+        Storageref.getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+            byte[] bytes1 = bytes;
+            Bitmap bitmap = ImageHelper.toBitmap(bytes1);
+            binding.tuitionDImg.setImageBitmap(bitmap);
+        }).addOnFailureListener(exception -> {
+            Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
+        });
 
-        final StorageReference ref = Storageref.child(cTuitionId + ".jpg");
-        UploadTask uploadTask = ref.putFile(imageUri);
+    }
+
+    private void UploadImage(byte[] imageUri) {
+
+        final StorageReference ref = Storageref;
+        UploadTask uploadTask = ref.putBytes(imageUri);
 
         uploadTask.continueWithTask(task -> {
             if (!task.isSuccessful()) {
@@ -682,15 +699,16 @@ public class TuitionDetails extends AppCompatActivity {
             alertDialog.dismiss();
         }, 3000);
     }
-    private void ShowDeleteDialog(String SessionIDs){
-        AlertDialog.Builder builder = new AlertDialog.Builder(TuitionDetails.this,R.style.AppTheme_Dark_Dialog);
+
+    private void ShowDeleteDialog(String SessionIDs) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(TuitionDetails.this, R.style.AppTheme_Dark_Dialog);
         builder.setMessage("Want to delete this session ?")
-                .setPositiveButton("Yes", (DialogInterface.OnClickListener) (dialog, id) -> {
+                .setPositiveButton("Yes", (dialog, id) -> {
                     sessionRef.child(SessionIDs).removeValue();
                     Toast.makeText(TuitionDetails.this, "Note deleted", Toast.LENGTH_SHORT).show();
                     dialog.dismiss();
                 })
-                .setNegativeButton("No", (DialogInterface.OnClickListener) (dialog, id) -> {
+                .setNegativeButton("No", (dialog, id) -> {
                     dialog.dismiss();
                     recreate();
                 });
