@@ -49,6 +49,7 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
+                        android:textColor="@color/teal_700"
                         android:textAlignment="center"
                         android:text="Tuition Title"
                         android:textSize="20dp" />
@@ -75,6 +76,8 @@
                         android:layout_weight="1"
                         android:layout_height="wrap_content"
                         android:padding="5dp"
+                        android:maxLines="1"
+                        android:textColor="@color/teal_700"
                         android:text="0 of 0 days"
                         android:textAlignment="center"
                         android:textSize="16dp" />

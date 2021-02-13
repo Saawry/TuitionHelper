@@ -1,6 +1,7 @@
 package com.gadware.tution.Activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.gadware.tution.Activities.LoginActivity;
 import com.gadware.tution.R;
+import com.gadware.tution.asset.EncryptedSharedPrefManager;
 import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityUserProfileBinding;
 import com.google.android.gms.ads.AdListener;
@@ -36,12 +38,15 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.auth.api.Auth;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -51,7 +56,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class UserProfile extends AppCompatActivity {
@@ -59,9 +68,12 @@ public class UserProfile extends AppCompatActivity {
     ActivityUserProfileBinding binding;
     private AlertDialog alertDialog;
     private AlertDialog alertDialogx;
-    StorageReference Storageref;
-    DatabaseReference userInfoRef;
+    private AlertDialog alert;
+
+    StorageReference Storageref,tuitionImages;
+    DatabaseReference userInfoRef,tuitionRef,scheduleRef,sessionRef;
     String muserId;
+    List<String> tuitionList=new ArrayList<>();
     private static final int PERMISSION_ALL = 222;
     private static final String[] PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -77,10 +89,6 @@ public class UserProfile extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
 
         muserId = FirebaseAuth.getInstance().getUid();
-
-
-
-
 
 
         AdView adView = new AdView(this);
@@ -125,11 +133,13 @@ public class UserProfile extends AppCompatActivity {
         });
 
 
-
-
         Storageref = FirebaseStorage.getInstance().getReference("Images").child(muserId + ".jpg");
-        userInfoRef = FirebaseDatabase.getInstance().getReference("Users").child(muserId).child("UserInfo");
-        Showialog();
+        tuitionImages = FirebaseStorage.getInstance().getReference("Images");
+        userInfoRef = FirebaseDatabase.getInstance().getReference("Users").child(muserId);
+        sessionRef = FirebaseDatabase.getInstance().getReference("Session List");
+        tuitionRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(muserId);
+        scheduleRef = FirebaseDatabase.getInstance().getReference("Schedule List");
+        ShowDialog();
         RetrieveUserInfo();
         RetriveUserImage();
         binding.userImageIV.setOnClickListener(v -> {
@@ -162,48 +172,125 @@ public class UserProfile extends AppCompatActivity {
 
         binding.signoutBtn.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
+            try {
+                EncryptedSharedPrefManager.getInstance(this).removeData("UserID");
+            } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
+            }
             startActivity(new Intent(this, LoginActivity.class));
+            finish();
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         });
 
         binding.deleteAccBtn.setOnClickListener(v -> {
-            //show delete confirm dialog
-            Showialog();
-            DeleteAccount();
+            ShowDeleteDialog();
         });
 
+        binding.favAddNewReportBtn.setOnClickListener(v -> {
+            startActivity(new Intent(this, ReportActivity.class));
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+        });
     }
 
     private void DeleteAccount() {
-        //get tuition list and delete
-        //get session for all tuition and delete
-        //get Schedule for all tuition and delete
-        //delete all tuition images
-        //delete user info
-        //delete user Image
-        //delete authentication account
+        ShowDialog();
+        getTuitionList();
+
+        Storageref.delete().addOnSuccessListener(aVoid ->
+                tuitionRef.removeValue().addOnSuccessListener(aVoid12 ->
+                        userInfoRef.removeValue().addOnSuccessListener(aVoid1 ->
+                                DeleteAuth())));
+
+    }
+    private void getTuitionList(){
+
+        tuitionRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for (DataSnapshot k: snapshot.getChildren()){
+                    String key=k.getKey();
+                    Toast.makeText(UserProfile.this, key, Toast.LENGTH_SHORT).show();
+                    tuitionImages.child(key+".jpg").delete().addOnSuccessListener(aVoid ->
+                            sessionRef.child(key).removeValue().addOnSuccessListener(aVoid1 ->
+                                    scheduleRef.child(key).removeValue()));
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
+
     }
 
+    private void DeleteAuth() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        assert user != null;
+
+        user.delete().addOnSuccessListener(aVoid -> {
+            FirebaseAuth.getInstance().signOut();
+            try {
+                EncryptedSharedPrefManager.getInstance(this).removeData("UserID");
+            } catch (GeneralSecurityException | IOException e) {
+                e.printStackTrace();
+                alertDialog.dismiss();
+            }
+            alertDialog.dismiss();
+            Toast.makeText(this, "Successfully Deleted", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(this,ProfileSetupActivity.class));
+            finish();
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+
+        }).addOnFailureListener(e -> {
+            alertDialog.dismiss();
+            Toast.makeText(this, "Error Deleting Account", Toast.LENGTH_SHORT).show();
+        });
+
+    }
+
+
+    private void ShowDeleteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(UserProfile.this, R.style.AppTheme_Dark_Dialog);
+        builder.setMessage("Really Want to Delete Account ?\nAll of your Data will be removed !\nSelect 'Yes' if you are sure.")
+                .setPositiveButton("Yes", (dialog, id) -> {
+                    DeleteAccount();
+
+                })
+                .setNegativeButton("No", (dialog, id) -> {
+                    alert.dismiss();
+
+                });
+
+        alert = builder.create();
+        alert.setTitle("Permanently Delete Account");
+        alert.show();
+    }
     private void RetriveUserImage() {
         final long ONE_MEGABYTE = 1024 * 1024;
-        Storageref.getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
-            byte[] bytes1 = bytes;
-            Bitmap bitmap = ImageHelper.toBitmap(bytes1);
-            binding.userImageIV.setImageBitmap(bitmap);
-        }).addOnFailureListener(exception -> {
-            Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
-        });
+
+        try {
+            Storageref.getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+                byte[] bytes1 = bytes;
+                Bitmap bitmap = ImageHelper.toBitmap(bytes1);
+                binding.userImageIV.setImageBitmap(bitmap);
+            }).addOnFailureListener(exception -> {
+                Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
+            });
+        }catch (Exception e){
+
+        }
+
 
     }
 
     private void RetrieveUserInfo() {
-        userInfoRef.addValueEventListener(new ValueEventListener() {
+        userInfoRef.child("UserInfo").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 alertDialog.dismiss();
-//                if (snapshot.child("ImageUri").exists()) {
-//                    Glide.with(UserProfile.this).load(Objects.requireNonNull(snapshot.child("ImageUri").getValue()).toString()).into(binding.userImageIV);
-//                }
 
                 binding.inputName.setText(snapshot.child("name").getValue().toString());
                 binding.inputMobile.setText(snapshot.child("mobile").getValue().toString());
@@ -251,7 +338,7 @@ public class UserProfile extends AppCompatActivity {
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             //imageUri = data.getData();
 
-            Bitmap bitmap=ImageHelper.getImageFromResult(this,RESULT_OK,data);
+            Bitmap bitmap = ImageHelper.getImageFromResult(this, RESULT_OK, data);
 
             Bitmap bitmapx = ImageHelper.generateThumb(bitmap, 25000);
             binding.userImageIV.setImageBitmap(bitmapx);
@@ -285,7 +372,7 @@ public class UserProfile extends AppCompatActivity {
 
     }
 
-    private void Showialog() {
+    private void ShowDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(UserProfile.this);
 // ...Irrelevant code for customizing the buttons and title
         LayoutInflater inflater = UserProfile.this.getLayoutInflater();
@@ -321,7 +408,7 @@ public class UserProfile extends AppCompatActivity {
             } else if (newValue.length() < 4) {
                 editText.setError("Minimum length 4");
             } else {
-                userInfoRef.child(key).setValue(newValue).addOnSuccessListener(aVoid -> {
+                userInfoRef.child("UserInfo").child(key).setValue(newValue).addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Updated " + key, Toast.LENGTH_SHORT).show();
                     alertDialogx.dismiss();
                 }).addOnFailureListener(e -> {

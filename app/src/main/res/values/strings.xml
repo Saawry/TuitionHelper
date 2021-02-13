@@ -7,6 +7,11 @@
     <string name="resend_tv">
         <u>Resend Code</u>>
     </string>
+
+    <string name="reset_pass">
+        <u>Reset...</u>.
+    </string>
     <string name="wait">\" wait : \"</string>
+    <string name="help">Help &amp; Feedback</string>
 
 </resources>

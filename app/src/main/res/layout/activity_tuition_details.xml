@@ -120,6 +120,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight=".8"
                         android:padding="3dp"
+                        android:maxLines="1"
                         android:text="Location"
                         android:textAlignment="center"
                         android:textSize="17dp"
@@ -199,6 +200,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1.8"
                         android:padding="3dp"
+                        android:maxLines="1"
                         android:text="Completed 00 of 00 days"
                         android:textAlignment="center"
                         android:textColor="@color/primary_dark" />

@@ -6,8 +6,12 @@ import androidx.databinding.DataBindingUtil;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.gadware.tution.R;
@@ -43,6 +47,19 @@ public class SessionDetails extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_details);
         binding= DataBindingUtil.setContentView(this,R.layout.activity_session_details);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+        final View activityRootView = findViewById(R.id.activity_root_view);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+            if (heightDiff > dpToPx(SessionDetails.this, 100)) {
+                binding.adView.setVisibility(View.INVISIBLE);
+            } else {
+                binding.adView.setVisibility(View.VISIBLE);
+            } });
+
+
+
         sessionId=getIntent().getStringExtra("sessionId");
         tuitionId=getIntent().getStringExtra("tuitionId");
         sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionId).child(sessionId);
@@ -213,8 +230,14 @@ public class SessionDetails extends AppCompatActivity {
     private void Updatealue(String value, String key) {
         sessionRef.child(key).setValue(value).addOnSuccessListener(aVoid -> {
             Toast.makeText(this, "Updated "+key, Toast.LENGTH_SHORT).show();
+
         }).addOnFailureListener(e -> {
             Toast.makeText(this, "Couldn't update "+key, Toast.LENGTH_SHORT).show();
         });
+    }
+
+    public static float dpToPx(Context context, float valueInDp) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
     }
 }

@@ -9,14 +9,13 @@ public class TuitionInfo {
     private String completedDays;
     private String weeklyDays;
     private String remuneration;
-    private String Status;
     private String sDate;
     private String eDate;
 
     public TuitionInfo() {
     }
 
-    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status, String sDate, String eDate) {
+    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String sDate, String eDate) {
         this.id = id;
         this.studentName = studentName;
         this.location = location;
@@ -25,7 +24,6 @@ public class TuitionInfo {
         this.completedDays = completedDays;
         this.weeklyDays = weeklyDays;
         this.remuneration = remuneration;
-        Status = status;
         this.sDate = sDate;
         this.eDate = eDate;
     }
@@ -34,7 +32,7 @@ public class TuitionInfo {
 
 
 
-    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String status) {
+    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration) {
         this.id = id;
         this.studentName = studentName;
         this.location = location;
@@ -43,7 +41,6 @@ public class TuitionInfo {
         this.completedDays = completedDays;
         this.weeklyDays = weeklyDays;
         this.remuneration = remuneration;
-        Status = status;
     }
 
     public String getId() {
@@ -109,16 +106,6 @@ public class TuitionInfo {
     public void setRemuneration(String remuneration) {
         this.remuneration = remuneration;
     }
-
-    public String getStatus() {
-        return Status;
-    }
-
-    public void setStatus(String status) {
-        Status = status;
-    }
-
-
 
 
     public String getsDate() {

@@ -82,8 +82,6 @@ public class TuitionDetails extends AppCompatActivity {
     };
 
     private static final int PICK_IMAGE = 100;
-    Uri imageUri;
-
 
     private final Calendar myCalendar = Calendar.getInstance();
     private DatabaseReference tuitionRef, sessionRef, tuitionInfoRef;
@@ -668,13 +666,19 @@ public class TuitionDetails extends AppCompatActivity {
 
     private void RetriveImage() {
         final long ONE_MEGABYTE = 1024 * 1024;
-        Storageref.getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
-            byte[] bytes1 = bytes;
-            Bitmap bitmap = ImageHelper.toBitmap(bytes1);
-            binding.tuitionDImg.setImageBitmap(bitmap);
-        }).addOnFailureListener(exception -> {
-            Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
-        });
+        try {
+            Storageref.getBytes(ONE_MEGABYTE).addOnSuccessListener(bytes -> {
+                byte[] bytes1 = bytes;
+                Bitmap bitmap = ImageHelper.toBitmap(bytes1);
+                binding.tuitionDImg.setImageBitmap(bitmap);
+            }).addOnFailureListener(exception -> {
+                Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
+            });
+        }catch (Exception e){
+
+        }
+
+
 
     }
 

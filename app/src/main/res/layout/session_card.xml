@@ -66,6 +66,7 @@
                         android:layout_height="wrap_content"
                         android:padding="5dp"
                         android:text="Topic"
+                        android:maxLines="1"
                         android:textAlignment="center"
                         android:textSize="18dp" />
                 </LinearLayout>

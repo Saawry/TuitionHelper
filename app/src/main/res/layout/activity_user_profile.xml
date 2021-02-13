@@ -186,6 +186,24 @@
             android:background="@drawable/btn_background_round"
             android:text="Delete Acc Permanently"
             android:textColor="@color/white" />
+
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/favAddNewReportBtn"
+            android:layout_alignParentEnd="true"
+            android:tint="@color/primary_darker"
+            android:backgroundTint="@color/teal_700"
+            android:src="@drawable/ic_baseline_help_outline_24"
+            app:backgroundTint="@color/white"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="20dp"
+            android:layout_above="@id/adView"
+            android:contentDescription="@string/todo"
+            tools:ignore="RelativeOverlap" />
+
+
         <com.google.android.gms.ads.AdView
             xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:id="@+id/adView"

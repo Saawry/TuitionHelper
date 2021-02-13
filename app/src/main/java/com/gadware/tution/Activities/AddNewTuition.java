@@ -2,11 +2,15 @@ package com.gadware.tution.Activities;
 
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -56,6 +60,17 @@ public class AddNewTuition extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_tuition);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_tuition);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        final View activityRootView = findViewById(R.id.activity_root_view);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+            if (heightDiff > dpToPx(AddNewTuition.this, 100)) {
+                binding.adView.setVisibility(View.INVISIBLE);
+            } else {
+                binding.adView.setVisibility(View.VISIBLE);
+            } });
+
+
 
         mUserId=FirebaseAuth.getInstance().getUid();
 
@@ -250,8 +265,8 @@ public class AddNewTuition extends AppCompatActivity {
     private void InitNewTuition() {
 
         id = TuitionRef.push().getKey();
-        TuitionInfo tuitionInfo = new TuitionInfo(id, studentName, location, mobile, totalDays, completedDays, weeklyDays, remuneration, "Active");
-        TuitionRef.setValue(tuitionInfo).addOnSuccessListener(aVoid -> {
+        TuitionInfo tuitionInfo = new TuitionInfo(id, studentName, location, mobile, totalDays, completedDays, weeklyDays, remuneration);
+        TuitionRef.child(id).setValue(tuitionInfo).addOnSuccessListener(aVoid -> {
 
             AddSchedules(id);
 
@@ -264,7 +279,10 @@ public class AddNewTuition extends AppCompatActivity {
             DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id);
             ScheduleRef.child(daySchedule.getDayName()).setValue(daySchedule.getTime());
         }
-        startActivity(new Intent(this, MainActivity.class));
+        Intent intent=new Intent(this, TuitionDetails.class);
+        intent.putExtra("Tuition_id", id);
+        startActivity(intent);
+        finish();
         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 
@@ -351,5 +369,8 @@ public class AddNewTuition extends AppCompatActivity {
         }, hour, minte, false);
         nTime.show();
     }
-
+    public static float dpToPx(Context context, float valueInDp) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
+    }
 }

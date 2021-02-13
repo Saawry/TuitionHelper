@@ -1,15 +1,14 @@
 package com.gadware.tution.models;
 
 public class User {
-    private String uid,email, password,address, mobile,name;
+    private String uid,email,address, mobile,name;
 
     public User() {
     }
 
-    public User(String uid, String email, String password, String address, String mobile, String name ) {
+    public User(String uid, String email,  String address, String mobile, String name ) {
         this.uid = uid;
         this.email = email;
-        this.password = password;
         this.address = address;
         this.mobile = mobile;
         this.name = name;
@@ -40,13 +39,6 @@ public class User {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     public String getAddress() {
         return address;

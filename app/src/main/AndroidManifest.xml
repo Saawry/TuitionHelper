@@ -4,9 +4,10 @@
     package="com.gadware.tution">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.CALL_PHONE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
 
     <application
@@ -16,16 +17,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TuitionHelper">
+
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-7098600576446460~7810184984"/>
-<!--            android:value="ca-app-pub-3940256099942544~3347511713"/>-->
-
+            android:value="ca-app-pub-7098600576446460~7810184984" /> <!-- android:value="ca-app-pub-3940256099942544~3347511713"/> -->
         <activity android:name=".Activities.SessionDetails" />
         <activity android:name=".Activities.TuitionDetails" />
         <activity android:name=".Activities.AddNewSession" />
-
         <activity android:name=".Activities.UserProfile" />
+        <activity android:name=".Activities.ReportActivity" />
         <activity android:name=".Activities.ProfileSetupActivity" />
         <activity android:name=".Activities.SplashActivity">
             <intent-filter>

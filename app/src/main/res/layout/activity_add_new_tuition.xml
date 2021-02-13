@@ -4,104 +4,109 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
+        android:id="@+id/activity_root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         tools:context="view.activity.AddNewTuition">
 
         <TextView
-            android:paddingLeft="20dp"
-            android:textSize="15dp"
             android:id="@+id/toolbarview"
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:background="@color/primary_dark"
             android:gravity="center_vertical"
+            android:paddingLeft="20dp"
             android:text="Add New Tuition"
-            android:textColor="@color/white" />
+            android:textColor="@color/white"
+            android:textSize="15dp" />
 
-
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/adView"
+            android:layout_below="@+id/toolbarview">
 
             <LinearLayout
-                android:orientation="vertical"
-                android:layout_below="@+id/toolbarview"
-                android:padding="10dp"
-                android:layout_margin="15dp"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="15dp"
+                android:orientation="vertical"
+                android:padding="10dp">
 
 
-                    <com.google.android.material.textfield.TextInputLayout
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp">
+
+                    <EditText
+                        android:id="@+id/input_studentName"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginBottom="3dp">
+                        android:hint="Student's Name"
+                        android:inputType="textPersonName" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <EditText
-                            android:id="@+id/input_studentName"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Student's Name"
-                            android:inputType="textPersonName" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp">
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <EditText
+                        android:id="@+id/input_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginBottom="3dp">
+                        android:hint="Location"
+                        android:inputType="textPostalAddress" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                        <EditText
-                            android:id="@+id/input_location"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Location"
-                            android:inputType="textPostalAddress" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp">
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <EditText
+                        android:id="@+id/input_mobile"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginBottom="3dp">
+                        android:hint="Mobile Number"
+                        android:inputType="phone" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <!-- Address Label -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp">
 
-                        <EditText
-                            android:id="@+id/input_mobile"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Mobile Number"
-                            android:inputType="phone" />
-                    </com.google.android.material.textfield.TextInputLayout>
-                    <!-- Address Label -->
-                    <com.google.android.material.textfield.TextInputLayout
+                    <EditText
+                        android:id="@+id/input_TotalDays"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginBottom="3dp">
-
-                        <EditText
-                            android:id="@+id/input_TotalDays"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Total Days"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                        android:hint="Total Days"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
 
 
-                    <!--  Email Label -->
-                    <com.google.android.material.textfield.TextInputLayout
+                <!--  Email Label -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:layout_marginBottom="3dp">
+
+                    <EditText
+                        android:id="@+id/input_CompletedDays"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="3dp"
-                        android:layout_marginBottom="3dp">
-
-                        <EditText
-                            android:id="@+id/input_CompletedDays"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Completed Days"
-                            android:inputType="number" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                        android:hint="Completed Days"
+                        android:inputType="number" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
@@ -119,49 +124,49 @@
 
 
                 <TextView
-                    android:padding="10dp"
                     android:id="@+id/input_WeeklyDays"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Weekly Days"
-                    android:textAlignment="center"
-                    android:textSize="18sp"
                     android:layout_marginTop="5dp"
+                    android:hint="Weekly Days"
+                    android:padding="10dp"
+                    android:textAlignment="center"
                     android:textColor="@color/white"
-                    />
+                    android:textSize="18sp" />
+
                 <View
-                    android:background="@color/white"
                     android:layout_width="match_parent"
-                    android:layout_height="1dp"/>
+                    android:layout_height="1dp"
+                    android:background="@color/white" />
 
 
-
-                    <Button
-                        android:background="@drawable/btn_background_round"
-                        android:id="@+id/addTuitionBtnId"
-                        android:layout_width="match_parent"
-                        android:layout_height="30dp"
-                        android:layout_marginTop="35dp"
-                        android:text="Add"
-                        android:textAlignment="center"
-                        android:textColor="@color/white" />
+                <Button
+                    android:id="@+id/addTuitionBtnId"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="35dp"
+                    android:background="@drawable/btn_background_round"
+                    android:text="Add"
+                    android:textAlignment="center"
+                    android:textColor="@color/white" />
 
             </LinearLayout>
-        <com.google.android.gms.ads.AdView
-            xmlns:ads="http://schemas.android.com/apk/res-auto"
+        </ScrollView>
+
+
+        <com.google.android.gms.ads.AdView xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:id="@+id/adView"
             android:layout_width="match_parent"
             android:layout_height="60dp"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
             android:layout_margin="5dp"
             android:padding="5dp"
-            android:layout_centerHorizontal="true"
-            android:layout_alignParentBottom="true"
             ads:adSize="BANNER"
             ads:adUnitId="ca-app-pub-7098600576446460/2003905092">
             <!--            ads:adUnitId="ca-app-pub-7098600576446460/2003905092">-->
         </com.google.android.gms.ads.AdView>
-        </RelativeLayout>
-
+    </RelativeLayout>
 
 
 </layout>

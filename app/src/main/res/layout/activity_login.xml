@@ -48,22 +48,46 @@
                 android:layout_marginBottom="8dp">
 
                 <EditText
-                    android:inputType="textPassword"
                     android:id="@+id/etPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Password" />
+                    android:hint="Password"
+                    android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/lay_reset_pass"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:padding="5dp"
+                android:layout_margin="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Forgot Password?" />
+
+                <TextView
+                    android:textColor="@color/link_color"
+                    android:id="@+id/resetPass_tv"
+                    android:layout_marginStart="5dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/reset_pass" />
+            </LinearLayout>
+
             <androidx.appcompat.widget.AppCompatButton
-                android:background="@drawable/btn_background_round"
                 android:id="@+id/btnLogin"
-                android:textColor="@color/white"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
                 android:layout_marginTop="24dp"
+                android:background="@drawable/btn_background_round"
                 android:text="Login"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
 
 
             <TextView
@@ -72,19 +96,19 @@
                 android:layout_height="match_parent"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
-                android:textSize="18sp"
+                android:text="or"
                 android:textColor="@color/white"
-                android:text="or" />
+                android:textSize="18sp" />
 
             <Button
                 android:id="@+id/btnNewAcc"
-                android:background="@drawable/btn_background_round"
                 android:layout_width="fill_parent"
                 android:layout_height="30dp"
                 android:layout_marginTop="10dp"
-                android:textColor="@color/white"
+                android:background="@drawable/btn_background_round"
                 android:text="Sign Up"
-                android:textAllCaps="false" />
+                android:textAllCaps="false"
+                android:textColor="@color/white" />
         </LinearLayout>
     </ScrollView>
 </layout>

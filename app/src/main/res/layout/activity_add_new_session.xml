@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <RelativeLayout
-
+        android:id="@+id/activity_root_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context="view.activity.AddNewSession">
@@ -20,138 +20,144 @@
             android:textColor="@color/white"
             android:textSize="15dp" />
 
-
-        <LinearLayout
+<ScrollView
+    android:layout_above="@+id/adView"
+    android:layout_below="@+id/toolbarview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="15dp"
+        android:orientation="vertical"
+        android:padding="10dp">
+        <TextView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/toolbarview"
-            android:layout_margin="15dp"
-            android:orientation="vertical"
-            android:padding="10dp">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Date"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:padding="10dp"
-                android:id="@+id/input_Date"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Date"
-                android:textAlignment="center"
-                android:textSize="21sp"
-                android:textColor="@color/white"
-                />
-            <View
-                android:background="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"/>
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            />
+        <TextView
+            android:padding="10dp"
+            android:id="@+id/input_Date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textAlignment="center"
+            android:textSize="21sp"
+            android:textColor="@color/white"
+            />
+        <View
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
 
 
-            <TextView
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Start Time"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:padding="10dp"
-                android:id="@+id/input_sTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="S Time"
-                android:textAlignment="center"
-                android:textSize="21sp"
-                android:textColor="@color/white"
-                />
-            <View
-                android:background="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"/>
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Time"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            />
+        <TextView
+            android:padding="10dp"
+            android:id="@+id/input_sTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="S Time"
+            android:textAlignment="center"
+            android:textSize="21sp"
+            android:textColor="@color/white"
+            />
+        <View
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
 
-            <TextView
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="End Time"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:padding="10dp"
-                android:id="@+id/input_eTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="E Time"
-                android:textAlignment="center"
-                android:textSize="21sp"
-                android:textColor="@color/white"
-                />
-            <View
-                android:background="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"/>
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="End Time"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            />
+        <TextView
+            android:padding="10dp"
+            android:id="@+id/input_eTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="E Time"
+            android:textAlignment="center"
+            android:textSize="21sp"
+            android:textColor="@color/white"
+            />
+        <View
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
 
-            <TextView
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Day"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:padding="10dp"
-                android:id="@+id/input_Day"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Day"
-                android:textAlignment="center"
-                android:textSize="21sp"
-                android:textColor="@color/white"
-                />
-            <View
-                android:background="@color/white"
-                android:layout_width="match_parent"
-                android:layout_height="1dp"/>
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            />
+        <TextView
+            android:padding="10dp"
+            android:id="@+id/input_Day"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Day"
+            android:textAlignment="center"
+            android:textSize="21sp"
+            android:textColor="@color/white"
+            />
+        <View
+            android:background="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"/>
 
-            <TextView
-                android:layout_marginTop="10dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Topic"
-                android:textAlignment="center"
-                android:textColor="@color/black"
-                />
-            <EditText
-                android:padding="10dp"
-                android:id="@+id/input_Topic"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Topic"
-                android:textAlignment="center"
-                android:textSize="21sp"
-                android:textColor="@color/white"
-                />
+        <TextView
+            android:layout_marginTop="10dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Topic"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            />
+        <EditText
+            android:padding="10dp"
+            android:id="@+id/input_Topic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Topic"
+            android:textAlignment="center"
+            android:textSize="21sp"
+            android:textColor="@color/white"
+            />
 
 
 
-            <Button
-                android:id="@+id/addSessionBtnId"
-                android:layout_width="match_parent"
-                android:layout_height="30dp"
-                android:layout_marginTop="35dp"
-                android:background="@drawable/btn_background_round"
-                android:text="Add"
-                android:textAlignment="center"
-                android:textColor="@color/white" />
+        <Button
+            android:id="@+id/addSessionBtnId"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:layout_marginTop="35dp"
+            android:background="@drawable/btn_background_round"
+            android:text="Add"
+            android:textAlignment="center"
+            android:textColor="@color/white" />
 
-        </LinearLayout>
+    </LinearLayout>
+</ScrollView>
+
         <com.google.android.gms.ads.AdView
             xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:id="@+id/adView"

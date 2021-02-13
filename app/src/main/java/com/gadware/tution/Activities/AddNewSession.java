@@ -3,12 +3,16 @@ package com.gadware.tution.Activities;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.DatePicker;
 import android.widget.Toast;
 
@@ -57,6 +61,15 @@ public class AddNewSession extends AppCompatActivity {
         setContentView(R.layout.activity_add_new_session);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+        final View activityRootView = findViewById(R.id.activity_root_view);
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
+            if (heightDiff > dpToPx(AddNewSession.this, 100)) {
+                binding.adView.setVisibility(View.INVISIBLE);
+            } else {
+                binding.adView.setVisibility(View.VISIBLE);
+            } });
 
         tuitionid = getIntent().getExtras().get("Tuition_id").toString();
         completedDays = getIntent().getExtras().get("completedDays").toString();
@@ -193,6 +206,7 @@ public class AddNewSession extends AppCompatActivity {
             Intent intent = new Intent(AddNewSession.this, TuitionDetails.class);
             intent.putExtra("Tuition_id", tuitionid);
             startActivity(intent);
+            finish();
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         }).addOnFailureListener(e -> {
             alertDialog.dismiss();
@@ -264,5 +278,10 @@ public class AddNewSession extends AppCompatActivity {
         alertDialog.setCancelable(false);
         alertDialog.show();
 
+    }
+
+    public static float dpToPx(Context context, float valueInDp) {
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, valueInDp, metrics);
     }
 }
