@@ -2,6 +2,7 @@ package com.gadware.tution.Activities;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,8 +12,10 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.security.crypto.EncryptedSharedPreferences;
 
 import com.gadware.tution.R;
+import com.gadware.tution.asset.DocHelper;
 import com.gadware.tution.asset.EncryptedSharedPrefManager;
 import com.gadware.tution.databinding.ActivityLoginBinding;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -26,6 +29,9 @@ import com.google.firebase.auth.FirebaseUser;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
+
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -72,11 +78,18 @@ public class LoginActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, task -> {
                     if (task.isSuccessful()) {
                         alertDialog.dismiss();
+
+
+                        SharedPreferences sharedPreferences = null;
                         try {
-                            EncryptedSharedPrefManager.getInstance(this).saveData("UserID",mAuth.getUid());
+                            sharedPreferences = EncryptedSharedPreferences.create(this, "mysecuredata.txt", DocHelper.getMKey(this), AES256_SIV, AES256_GCM);
                         } catch (GeneralSecurityException | IOException e) {
-                            e.printStackTrace();
+                            //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("UserID", FirebaseAuth.getInstance().getUid());
+                        editor.apply();
 
                         startActivity(new Intent(this, MainActivity.class));
                         finish();

@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:padding="3dp"
         android:textSize="16sp"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:background="@drawable/btn_background_stroke_teal"
         android:hint=".........."
         android:id="@+id/dialog_input"/>

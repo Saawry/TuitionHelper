@@ -3,9 +3,11 @@ package com.gadware.tution.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.security.crypto.EncryptedSharedPreferences;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +16,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.gadware.tution.R;
+import com.gadware.tution.asset.DocHelper;
 import com.gadware.tution.asset.EncryptedSharedPrefManager;
 import com.gadware.tution.models.User;
 import com.gadware.tution.databinding.ActivityProfileSetupBinding;
@@ -28,6 +31,9 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
 
 public class ProfileSetupActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
@@ -82,11 +88,21 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         userRef = FirebaseDatabase.getInstance().getReference("Users").getRef();
                         userRef.child(uid).child("UserInfo").setValue(user).addOnSuccessListener(aVoid -> {
                             alertDialog.dismiss();
+
+
+                            SharedPreferences sharedPreferences = null;
                             try {
-                                EncryptedSharedPrefManager.getInstance(this).saveData("UserID",mAuth.getUid());
+                                sharedPreferences = EncryptedSharedPreferences.create(this, "mysecuredata.txt", DocHelper.getMKey(this), AES256_SIV, AES256_GCM);
                             } catch (GeneralSecurityException | IOException e) {
-                                e.printStackTrace();
+                                //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                             }
+
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("UserID", uid);
+                            editor.apply();
+
+
+
                             Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(ProfileSetupActivity.this, MainActivity.class));
                             finish();

@@ -108,27 +108,39 @@
                     android:inputType="textPassword" />
             </com.google.android.material.textfield.TextInputLayout>
 
+
+
+
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_signup"
                 android:layout_width="fill_parent"
                android:background="@drawable/btn_background_round"
                 android:layout_height="30dp"
                 android:layout_marginTop="24dp"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="10dp"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:text="Create Account" />
-
             <TextView
+
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/black"
+                android:text="or"
+                android:textSize="14sp" />
+            <androidx.appcompat.widget.AppCompatButton
                 android:textAllCaps="false"
                 android:id="@+id/link_login"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
-                android:gravity="center"
+                android:background="@drawable/btn_background_round"
+                android:layout_height="30dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginBottom="20dp"
                 android:textColor="@color/white"
-                android:text="Already Have an Account? Login"
-                android:textSize="16dip" />
+                android:text="Login" />
+
 
         </LinearLayout>
 

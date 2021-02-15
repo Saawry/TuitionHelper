@@ -9,28 +9,25 @@ import androidx.annotation.NonNull;
 import androidx.security.crypto.EncryptedSharedPreferences;
 import androidx.security.crypto.MasterKey;
 
-import com.google.firebase.database.annotations.NotNull;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
 import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
 
 public class EncryptedSharedPrefManager {
 
     @NonNull
-    @NotNull
-    private static final String SHARED_PREF_NAME = "my_en_sh_pre";
 
-    private static EncryptedSharedPrefManager mInstance;
-    @NonNull
-    @NotNull
-    private Context mCtx;
+    private static final String SHARED_PREF_NAME = "my_en_sh_pre.txt";
+
+    public static EncryptedSharedPrefManager mInstance;
+     Context mCtx;
 
     @NonNull
-    @NotNull
-    private static MasterKey masterKey;
+
+    public static MasterKey masterKey;
 
 
     KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
@@ -59,7 +56,7 @@ public class EncryptedSharedPrefManager {
 //            e.printStackTrace();
 //        }
 
-    private EncryptedSharedPrefManager(@org.jetbrains.annotations.NotNull Context mCtx) {
+    public EncryptedSharedPrefManager(@org.jetbrains.annotations.NotNull Context mCtx) {
         this.mCtx = mCtx;
     }
 

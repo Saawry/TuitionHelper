@@ -6,6 +6,7 @@ import androidx.databinding.DataBindingUtil;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Toast;
 
 import com.gadware.tution.R;
 import com.gadware.tution.databinding.ActivityReportBinding;
@@ -14,7 +15,7 @@ import com.google.firebase.auth.FirebaseUser;
 
 public class ReportActivity extends AppCompatActivity {
     ActivityReportBinding binding;
-    String email;
+    String emailAddress;
     FirebaseAuth mAuth;
 
     @Override
@@ -24,14 +25,13 @@ public class ReportActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_report);
 
         mAuth = FirebaseAuth.getInstance();
-        email = mAuth.getCurrentUser().getEmail();
-
+        emailAddress = mAuth.getCurrentUser().getEmail();
 
         binding.btnFeedback.setOnClickListener(v -> {
             Intent email = new Intent(Intent.ACTION_SEND);
             email.putExtra(Intent.EXTRA_EMAIL, new String[]{"gadware.tuition@gmail.com"});
             email.putExtra(Intent.EXTRA_SUBJECT, "Feedback");
-            email.putExtra(Intent.EXTRA_TEXT, "Hello Gadware,\nI am (name) and User ID is" + email + ", sending you a feedback described bellow.");
+            email.putExtra(Intent.EXTRA_TEXT, "Hello Gadware,\nI am (name) and User ID is " + emailAddress + ", sending you a feedback described bellow.");
 
             //need this to prompts email client only
             email.setType("message/rfc822");

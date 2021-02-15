@@ -5,10 +5,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.security.crypto.EncryptedSharedPreferences;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,6 +26,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.firebase.ui.database.SnapshotParser;
 import com.gadware.tution.R;
+import com.gadware.tution.asset.DocHelper;
 import com.gadware.tution.asset.EncryptedSharedPrefManager;
 import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityMainBinding;
@@ -52,8 +55,12 @@ import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
+
 public class MainActivity extends AppCompatActivity {
 
+    private static final String SHARED_PREF_NAME = "mysecuredata.txt";
     private ActivityMainBinding binding;
     private AlertDialog alertDialog;
 
@@ -74,11 +81,14 @@ public class MainActivity extends AppCompatActivity {
         mUser = mAuth.getCurrentUser();
 
 
+        SharedPreferences sharedPreferences = null;
         try {
-            SharedId= EncryptedSharedPrefManager.getInstance(this).getData("UserID");
+            sharedPreferences = EncryptedSharedPreferences.create(this, SHARED_PREF_NAME, DocHelper.getMKey(this), AES256_SIV, AES256_GCM);
         } catch (GeneralSecurityException | IOException e) {
-            e.printStackTrace();
+            //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
+
+        SharedId= sharedPreferences.getString("UserID", "null");
 
         if (mUser==null || SharedId.equals("null")){
             startActivity(new Intent(this, LoginActivity.class));
@@ -91,14 +101,16 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+            }finally {
+                Showialog();
+                RetriveImage();
+                tuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
+                RetriveTuitionInfoList();
+                binding.tuitionRecycler.setLayoutManager(new LinearLayoutManager(this));
             }
         }
 
-        Showialog();
-        RetriveImage();
-        tuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
-        RetriveTuitionInfoList();
-        binding.tuitionRecycler.setLayoutManager(new LinearLayoutManager(this));
+
 
 
 

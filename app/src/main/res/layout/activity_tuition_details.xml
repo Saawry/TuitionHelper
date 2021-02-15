@@ -49,6 +49,7 @@
                 <ImageView
                     android:scaleType="fitCenter"
                     android:id="@+id/tuitionDImg"
+                    android:src="@drawable/ic_baseline_account_circle_24"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
             </androidx.cardview.widget.CardView>

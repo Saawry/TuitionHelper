@@ -4,12 +4,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.security.crypto.EncryptedSharedPreferences;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -17,6 +19,8 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +33,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.gadware.tution.Activities.LoginActivity;
 import com.gadware.tution.R;
+import com.gadware.tution.asset.DocHelper;
 import com.gadware.tution.asset.EncryptedSharedPrefManager;
 import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityUserProfileBinding;
@@ -44,6 +49,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
@@ -63,17 +70,21 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
+
 public class UserProfile extends AppCompatActivity {
 
     ActivityUserProfileBinding binding;
     private AlertDialog alertDialog;
     private AlertDialog alertDialogx;
     private AlertDialog alert;
-
-    StorageReference Storageref,tuitionImages;
-    DatabaseReference userInfoRef,tuitionRef,scheduleRef,sessionRef;
+    String newValue="";
+    List<String> dl = new ArrayList<>();
+    StorageReference Storageref, tuitionImages;
+    DatabaseReference userInfoRef, tuitionRef, scheduleRef, sessionRef;
     String muserId;
-    List<String> tuitionList=new ArrayList<>();
+    List<String> tuitionList = new ArrayList<>();
     private static final int PERMISSION_ALL = 222;
     private static final String[] PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -94,10 +105,9 @@ public class UserProfile extends AppCompatActivity {
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
         //adView.setAdUnitId("ca-app-pub-7098600576446460/8504173760");
-        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        adView.setAdUnitId("ca-app-pub-7098600576446460/8504173760");
 
         MobileAds.initialize(this, initializationStatus -> {
-
         });
 
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -172,11 +182,20 @@ public class UserProfile extends AppCompatActivity {
 
         binding.signoutBtn.setOnClickListener(v -> {
             FirebaseAuth.getInstance().signOut();
+
+
+            SharedPreferences sharedPreferences = null;
             try {
-                EncryptedSharedPrefManager.getInstance(this).removeData("UserID");
+                sharedPreferences = EncryptedSharedPreferences.create(this, "mysecuredata.txt", DocHelper.getMKey(this), AES256_SIV, AES256_GCM);
             } catch (GeneralSecurityException | IOException e) {
-                e.printStackTrace();
+                //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.remove("UserID");
+            editor.apply();
+
+
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -193,26 +212,45 @@ public class UserProfile extends AppCompatActivity {
     }
 
     private void DeleteAccount() {
+        alert.dismiss();
         ShowDialog();
         getTuitionList();
 
-        Storageref.delete().addOnSuccessListener(aVoid ->
-                tuitionRef.removeValue().addOnSuccessListener(aVoid12 ->
-                        userInfoRef.removeValue().addOnSuccessListener(aVoid1 ->
-                                DeleteAuth())));
+        tuitionRef.removeValue().addOnSuccessListener(aVoid12 ->
+                Storageref.delete().addOnSuccessListener(aVoid ->
+                        userInfoRef.removeValue().addOnSuccessListener(aVoid1 -> {
+                                    DeleteAuth();
+
+                                }
+
+                        )
+                )
+        );
 
     }
-    private void getTuitionList(){
+
+    private void getTuitionList() {
+
 
         tuitionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for (DataSnapshot k: snapshot.getChildren()){
-                    String key=k.getKey();
-                    Toast.makeText(UserProfile.this, key, Toast.LENGTH_SHORT).show();
-                    tuitionImages.child(key+".jpg").delete().addOnSuccessListener(aVoid ->
-                            sessionRef.child(key).removeValue().addOnSuccessListener(aVoid1 ->
-                                    scheduleRef.child(key).removeValue()));
+
+                for (DataSnapshot k : snapshot.getChildren()) {
+                    String key = k.getKey();
+                    dl.add(key);
+                }
+                binding.inputName.setText(String.valueOf(dl.size()));
+                for (String ky : dl) {
+                    tuitionImages.child(ky + ".jpg").delete().addOnSuccessListener(aVoid ->
+                    {
+                        sessionRef.child(ky).removeValue().addOnSuccessListener(aVoid1 -> {
+                                    scheduleRef.child(ky).removeValue().addOnSuccessListener(aVoid2 -> {
+                                        Toast.makeText(UserProfile.this, "Deleting", Toast.LENGTH_SHORT).show();
+                                    });
+                                }
+                        );
+                    });
                 }
 
             }
@@ -229,24 +267,52 @@ public class UserProfile extends AppCompatActivity {
     private void DeleteAuth() {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user != null;
+        SharedPreferences sharedPreferences = null;
+        try {
+            sharedPreferences = EncryptedSharedPreferences.create(this, "mysecuredata.txt", DocHelper.getMKey(this), AES256_SIV, AES256_GCM);
+        } catch (GeneralSecurityException | IOException e) {
+            alertDialog.dismiss();
+            //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.remove("UserID");
+        editor.apply();
+
+
+
+
 
         user.delete().addOnSuccessListener(aVoid -> {
             FirebaseAuth.getInstance().signOut();
-            try {
-                EncryptedSharedPrefManager.getInstance(this).removeData("UserID");
-            } catch (GeneralSecurityException | IOException e) {
-                e.printStackTrace();
-                alertDialog.dismiss();
-            }
             alertDialog.dismiss();
             Toast.makeText(this, "Successfully Deleted", Toast.LENGTH_SHORT).show();
-            startActivity(new Intent(this,ProfileSetupActivity.class));
+            startActivity(new Intent(this, ProfileSetupActivity.class));
             finish();
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
 
         }).addOnFailureListener(e -> {
             alertDialog.dismiss();
-            Toast.makeText(this, "Error Deleting Account", Toast.LENGTH_SHORT).show();
+            //binding.inputName.setText(e.getLocalizedMessage());
+            String email=FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            GetPassword();
+            while (true){
+                if (newValue.isEmpty() || newValue.length()<6){
+                    GetPassword();
+                }else
+                    break;
+            }
+            assert email != null;
+            AuthCredential credential = EmailAuthProvider
+                    .getCredential(email, newValue);
+
+
+            user.reauthenticate(credential)
+                    .addOnCompleteListener(task -> {
+                        DeleteAuth();
+                    });
+
+            new Handler(Looper.getMainLooper()).postDelayed(this::DeleteAuth, 2000);
         });
 
     }
@@ -268,6 +334,7 @@ public class UserProfile extends AppCompatActivity {
         alert.setTitle("Permanently Delete Account");
         alert.show();
     }
+
     private void RetriveUserImage() {
         final long ONE_MEGABYTE = 1024 * 1024;
 
@@ -279,7 +346,7 @@ public class UserProfile extends AppCompatActivity {
             }).addOnFailureListener(exception -> {
                 Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
             });
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
 
@@ -291,11 +358,13 @@ public class UserProfile extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 alertDialog.dismiss();
+                if (snapshot.child("name").exists() && snapshot.hasChildren()) {
+                    binding.inputName.setText(Objects.requireNonNull(snapshot.child("name").getValue()).toString());
+                    binding.inputMobile.setText(Objects.requireNonNull(snapshot.child("mobile").getValue()).toString());
+                    binding.inputEmail.setText(Objects.requireNonNull(snapshot.child("email").getValue()).toString());
+                    binding.inputAddress.setText(Objects.requireNonNull(snapshot.child("address").getValue()).toString());
+                }
 
-                binding.inputName.setText(snapshot.child("name").getValue().toString());
-                binding.inputMobile.setText(snapshot.child("mobile").getValue().toString());
-                binding.inputEmail.setText(snapshot.child("email").getValue().toString());
-                binding.inputAddress.setText(snapshot.child("address").getValue().toString());
             }
 
             @Override
@@ -383,6 +452,38 @@ public class UserProfile extends AppCompatActivity {
         alertDialog.show();
     }
 
+
+    private void GetPassword(){
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.dialog_update_value, null);
+        dialogBuilder.setView(dialogView);
+
+        TextView tv = dialogView.findViewById(R.id.title);
+        EditText editText = dialogView.findViewById(R.id.dialog_input);
+        Button cancelBtn = dialogView.findViewById(R.id.dialog_cancel_btn);
+        Button updateBtn = dialogView.findViewById(R.id.dialog_update_btn);
+        updateBtn.setText("Confirm");
+        tv.setText("Enter Password");
+        cancelBtn.setOnClickListener(v ->
+                alertDialogx.dismiss()
+        );
+
+        updateBtn.setOnClickListener(v -> {
+             newValue = editText.getText().toString();
+            if (newValue.equals("") || newValue.isEmpty() || newValue.length()<6) {
+                editText.setError("Password Length min 6");
+
+            }else{
+                alertDialogx.dismiss();
+            }
+        });
+
+        alertDialogx = dialogBuilder.create();
+        alertDialogx.show();
+
+    }
 
     private void GetValueAndUpdate(String key, String value) {
 

@@ -340,8 +340,8 @@ public class AddNewTuition extends AppCompatActivity {
 
 
         remuneration = binding.inputRemuneration.getText().toString();
-        if (remuneration.isEmpty() || remuneration.length() < 3) {
-            binding.inputRemuneration.setError("enter min 3 digit amount");
+        if (remuneration.isEmpty() || remuneration.length() < 2) {
+            binding.inputRemuneration.setError("enter min 2 digit amount");
             return 0;
         } else {
             binding.inputRemuneration.setError(null);
