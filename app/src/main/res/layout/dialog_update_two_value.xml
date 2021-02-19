@@ -101,6 +101,7 @@
         android:layout_marginStart="25dp"
         android:background="@drawable/btn_background_round"
         android:text="Cancel"
+        android:textColor="@color/white"
         android:textAllCaps="false" />
 
     <Button
@@ -112,6 +113,7 @@
         android:layout_marginEnd="25dp"
         android:background="@drawable/btn_background_round"
         android:text="Update"
+        android:textColor="@color/white"
         android:textAllCaps="false" />
 
 </RelativeLayout>

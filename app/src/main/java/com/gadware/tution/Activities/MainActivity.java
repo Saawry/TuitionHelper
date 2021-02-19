@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser mUser;
     private DatabaseReference tuitionRef;
 
-    private String mUserId,SharedId;
+    private String mUserId,SharedId="null";
     StorageReference Storageref;
 
     @Override
@@ -87,8 +87,12 @@ public class MainActivity extends AppCompatActivity {
         } catch (GeneralSecurityException | IOException e) {
             //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
+        try {
+            SharedId= sharedPreferences.getString("UserID", "null");
+        } catch (Exception e) {
+            //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        }
 
-        SharedId= sharedPreferences.getString("UserID", "null");
 
         if (mUser==null || SharedId.equals("null")){
             startActivity(new Intent(this, LoginActivity.class));
@@ -205,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
                 tuitionRef.child(TuitionIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        alertDialog.dismiss();
                         if (dataSnapshot.hasChildren()) {
                             binding.noDataLayout.setVisibility(View.GONE);
-                            alertDialog.dismiss();
                             RetriveImage(TuitionIDs, holder.tBinding.ProfileIcon);
                             String tDAys = dataSnapshot.child("totalDays").getValue().toString();
                             String cDAys = dataSnapshot.child("completedDays").getValue().toString();

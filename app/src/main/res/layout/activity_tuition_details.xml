@@ -44,7 +44,7 @@
                 android:layout_height="70dp"
                 android:layout_margin="5dp"
                 android:padding="6dp"
-                app:cardCornerRadius="70dp">
+                app:cardCornerRadius="32dp">
 
                 <ImageView
                     android:scaleType="fitCenter"
@@ -253,7 +253,6 @@
             android:layout_marginTop="25dp"
             android:layout_marginRight="5dp"
             android:layout_marginBottom="25dp"
-            android:background="@color/primary_lighter"
             android:orientation="horizontal"
             android:paddingLeft="5dp"
             android:paddingRight="5dp"
@@ -269,6 +268,7 @@
 
 
         <androidx.recyclerview.widget.RecyclerView
+
             android:id="@+id/sessionRecycler"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

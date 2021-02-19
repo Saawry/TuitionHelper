@@ -108,6 +108,7 @@ public class UserProfile extends AppCompatActivity {
         adView.setAdUnitId("ca-app-pub-7098600576446460/8504173760");
 
         MobileAds.initialize(this, initializationStatus -> {
+
         });
 
         AdRequest adRequest = new AdRequest.Builder().build();
@@ -358,12 +359,23 @@ public class UserProfile extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 alertDialog.dismiss();
-                if (snapshot.child("name").exists() && snapshot.hasChildren()) {
+
+                if (snapshot.hasChild("name")){
                     binding.inputName.setText(Objects.requireNonNull(snapshot.child("name").getValue()).toString());
+                }
+                if (snapshot.hasChild("mobile")){
                     binding.inputMobile.setText(Objects.requireNonNull(snapshot.child("mobile").getValue()).toString());
+                }
+                if (snapshot.hasChild("email")){
                     binding.inputEmail.setText(Objects.requireNonNull(snapshot.child("email").getValue()).toString());
+                }
+                if (snapshot.hasChild("address")){
                     binding.inputAddress.setText(Objects.requireNonNull(snapshot.child("address").getValue()).toString());
                 }
+
+
+
+
 
             }
 

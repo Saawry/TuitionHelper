@@ -72,7 +72,7 @@ public class SessionDetails extends AppCompatActivity {
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
         //adView.setAdUnitId("ca-app-pub-7098600576446460/5139643827");
-        adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+        adView.setAdUnitId("ca-app-pub-7098600576446460/5139643827");
 
         MobileAds.initialize(this, initializationStatus -> {
 

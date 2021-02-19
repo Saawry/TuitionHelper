@@ -84,7 +84,7 @@ public class LoginActivity extends AppCompatActivity {
                         try {
                             sharedPreferences = EncryptedSharedPreferences.create(this, "mysecuredata.txt", DocHelper.getMKey(this), AES256_SIV, AES256_GCM);
                         } catch (GeneralSecurityException | IOException e) {
-                            //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
 
                         SharedPreferences.Editor editor = sharedPreferences.edit();

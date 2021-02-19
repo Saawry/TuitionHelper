@@ -10,13 +10,21 @@
     <color name="white">#FFFFFFFF</color>
     <color name="transp">#0FFFFFFF</color>
 
-    <color name="primary">#E43F3F</color>
-    <color name="primary_lighter">#E55451</color>
+<!--    <color name="primary">#E43F3F</color>-->
+<!--    <color name="primary_lighter">#E55451</color>-->
+<!--    <color name="orange">#DE6E4B</color>-->
+<!--    <color name="primary_dark">#E12929</color>-->
+<!--    <color name="primary_darker">#CC1D1D</color>-->
+
+    <color name="primary">#9C8AA5</color>
+    <color name="primary_lighter">#BDAEC6</color>
     <color name="orange">#DE6E4B</color>
-    <color name="primary_dark">#E12929</color>
-    <color name="primary_darker">#CC1D1D</color>
+    <color name="primary_dark">#262254</color>
+    <color name="primary_darker">#0B032D</color>
+
     <color name="accent">#FFFFFF</color>
     <color name="jet">#222222</color>
+    <color name="blue_grey">#3F3F4E</color>
     <color name="oil">#333333</color>
     <color name="monsoon">#777777</color>
     <color name="jumbo">#888888</color>

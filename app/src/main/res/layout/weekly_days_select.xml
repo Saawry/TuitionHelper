@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center"
     android:layout_margin="10dp"
-    android:background="@color/primary"
+    android:background="@color/primary_dark"
     android:orientation="vertical"
     android:padding="10dp">
 
@@ -39,9 +39,11 @@
             android:id="@+id/satcheckBox"
             android:layout_width="110dp"
             android:layout_height="match_parent"
+            android:textColor="@color/white"
             android:text="Saturday" />
 
         <TextView
+            android:textColor="@color/white"
             android:hint="00.00 am"
             android:id="@+id/satTimeET"
             android:layout_width="110dp"
@@ -61,12 +63,14 @@
         android:padding="5dp">
 
         <CheckBox
+            android:textColor="@color/white"
             android:id="@+id/suncheckBox"
             android:layout_width="110dp"
             android:layout_height="match_parent"
             android:text="Sunday" />
 
         <TextView
+            android:textColor="@color/white"
             android:hint="00.00 am"
             android:id="@+id/sunTimeET"
             android:layout_width="110dp"
@@ -86,12 +90,14 @@
         android:padding="5dp">
 
         <CheckBox
+            android:textColor="@color/white"
             android:id="@+id/moncheckBox"
             android:layout_width="110dp"
             android:layout_height="match_parent"
             android:text="Monday" />
 
         <TextView
+            android:textColor="@color/white"
             android:hint="00.00 am"
             android:id="@+id/monTimeET"
             android:layout_width="110dp"
@@ -111,12 +117,14 @@
         android:padding="5dp">
 
         <CheckBox
+            android:textColor="@color/white"
             android:id="@+id/tuecheckBox"
             android:layout_width="110dp"
             android:layout_height="match_parent"
             android:text="Tuesday" />
 
         <TextView
+            android:textColor="@color/white"
             android:hint="00.00 am"
             android:id="@+id/tueTimeET"
             android:layout_width="110dp"
@@ -136,12 +144,14 @@
         android:padding="5dp">
 
         <CheckBox
+            android:textColor="@color/white"
             android:id="@+id/wedcheckBox"
             android:layout_width="110dp"
             android:layout_height="match_parent"
             android:text="Wednesday" />
 
         <TextView
+            android:textColor="@color/white"
             android:hint="00.00 am"
             android:id="@+id/wedTimeET"
             android:layout_width="110dp"
@@ -161,12 +171,14 @@
         android:padding="5dp">
 
         <CheckBox
+            android:textColor="@color/white"
             android:id="@+id/thucheckBox"
             android:layout_width="110dp"
             android:layout_height="match_parent"
             android:text="Thursday" />
 
         <TextView
+            android:textColor="@color/white"
             android:hint="00.00 am"
             android:id="@+id/thuTimeET"
             android:layout_width="110dp"
@@ -186,12 +198,14 @@
         android:padding="5dp">
 
         <CheckBox
+            android:textColor="@color/white"
             android:id="@+id/fricheckBox"
             android:layout_width="110dp"
             android:layout_height="match_parent"
             android:text="Friday" />
 
         <TextView
+            android:textColor="@color/white"
             android:hint="00.00 am"
             android:id="@+id/friTimeET"
             android:layout_width="110dp"

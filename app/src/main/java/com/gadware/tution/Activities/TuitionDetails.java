@@ -84,8 +84,10 @@ public class TuitionDetails extends AppCompatActivity {
     private static final int PICK_IMAGE = 100;
 
     private final Calendar myCalendar = Calendar.getInstance();
-    private DatabaseReference tuitionRef, sessionRef, tuitionInfoRef;
-    private String mUserId, cTuitionId, completedDays,totalDays, mobile;
+    private DatabaseReference tuitionRef;
+    private DatabaseReference sessionRef;
+    private DatabaseReference tuitionInfoRef;
+    private String mUserId, cTuitionId, completedDays, totalDays, mobile;
 
     List<DaySchedule> Schedule = new ArrayList<>();
     List<DaySchedule> NewDaySchedule = new ArrayList<>();
@@ -146,8 +148,7 @@ public class TuitionDetails extends AppCompatActivity {
 
         Storageref = FirebaseStorage.getInstance().getReference("Images").child(cTuitionId + ".jpg");
         tuitionInfoRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId);
-        sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(cTuitionId);
-
+        sessionRef = FirebaseDatabase.getInstance().getReference("Session List").child(cTuitionId);
 
         RetriveTuitionInfo();
         RetriveScheduleInfo();
@@ -168,7 +169,7 @@ public class TuitionDetails extends AppCompatActivity {
         });
 
         binding.tuitionDDTD.setOnClickListener(v -> {
-            GetValueAndUpdate("completedDays",completedDays,"totalDays",totalDays);
+            GetValueAndUpdate("completedDays", completedDays, "totalDays", totalDays);
         });
 
         binding.tuitionDMobile.setOnClickListener(v -> {
@@ -548,6 +549,7 @@ public class TuitionDetails extends AppCompatActivity {
     }
 
     private void RetriveSessionInfoList() {
+        sessionRef = FirebaseDatabase.getInstance().getReference("Session List").child(cTuitionId);
 
         FirebaseRecyclerOptions<SessionInfo> options = new FirebaseRecyclerOptions.Builder<SessionInfo>().setQuery(sessionRef, SessionInfo.class).build();
         final FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder> adapter = new FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder>(options) {
@@ -594,6 +596,8 @@ public class TuitionDetails extends AppCompatActivity {
                                 }
                             }).attachToRecyclerView(binding.sessionRecycler);
 
+                        }else{
+                            binding.noDataLayout.setVisibility(View.VISIBLE);
                         }
                     }
 
@@ -652,7 +656,7 @@ public class TuitionDetails extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == PICK_IMAGE) {
             //imageUri = data.getData();
-            Bitmap bitmap=ImageHelper.getImageFromResult(this,RESULT_OK,data);
+            Bitmap bitmap = ImageHelper.getImageFromResult(this, RESULT_OK, data);
 
             Bitmap bitmapx = ImageHelper.generateThumb(bitmap, 4500);
             binding.tuitionDImg.setImageBitmap(bitmapx);
@@ -672,12 +676,11 @@ public class TuitionDetails extends AppCompatActivity {
                 Bitmap bitmap = ImageHelper.toBitmap(bytes1);
                 binding.tuitionDImg.setImageBitmap(bitmap);
             }).addOnFailureListener(exception -> {
-                Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "No Image", Toast.LENGTH_SHORT).show();
             });
-        }catch (Exception e){
+        } catch (Exception e) {
 
         }
-
 
 
     }
@@ -720,10 +723,10 @@ public class TuitionDetails extends AppCompatActivity {
                 .setPositiveButton("Yes", (dialog, id) -> {
                     sessionRef.child(SessionIDs).removeValue();
                     Toast.makeText(TuitionDetails.this, "Note deleted", Toast.LENGTH_SHORT).show();
-                    dialog.dismiss();
+                    alert.dismiss();
                 })
                 .setNegativeButton("No", (dialog, id) -> {
-                    dialog.dismiss();
+                    alert.dismiss();
                     recreate();
                 });
 
@@ -790,7 +793,8 @@ public class TuitionDetails extends AppCompatActivity {
         alertDialogx = dialogBuilder.create();
         alertDialogx.show();
     }
-    private void ShowClock(TextView editText){
+
+    private void ShowClock(TextView editText) {
         Calendar myCalendar = Calendar.getInstance();
         String myTimeFormat = "hh.mm a";
 
@@ -809,10 +813,11 @@ public class TuitionDetails extends AppCompatActivity {
         }, hour, minte, false);
         nTime.show();
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(this,MainActivity.class));
+        startActivity(new Intent(this, MainActivity.class));
         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }
 }
