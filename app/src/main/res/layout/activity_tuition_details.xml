@@ -304,8 +304,6 @@
             android:padding="5dp"
             ads:adSize="BANNER"
             ads:adUnitId="ca-app-pub-7098600576446460/4992449955">
-<!--            ads:adUnitId="ca-app-pub-7098600576446460/4992449955">-->
-            <!--            ads:adUnitId="ca-app-pub-3940256099942544/6300978111">-->
         </com.google.android.gms.ads.AdView>
 
     </RelativeLayout>

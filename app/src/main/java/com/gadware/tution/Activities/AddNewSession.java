@@ -6,24 +6,23 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.DatePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.gadware.tution.R;
 import com.gadware.tution.databinding.ActivityAddNewSessionBinding;
+import com.gadware.tution.models.Batch;
 import com.gadware.tution.models.SessionInfo;
+import com.gadware.tution.viewmodel.SessionViewModel;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -33,26 +32,36 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Locale;
+
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
 
 public class AddNewSession extends AppCompatActivity {
 
 
     ActivityAddNewSessionBinding binding;
-    private AlertDialog alertDialog;
+    private AlertDialog alert;
+    private DatabaseReference sessionRef;
     private final Calendar myCalendar = Calendar.getInstance();
-    private String id, date, day, time, etime, topic;
+    private String id, type, date, day, time, etime, topic;
     int counter;
-    private String userId, tuitionid, completedDays;
+    private String userId, bTId, completedDays;
+    private long sessionCounter = 0;
+    private SessionViewModel sessionViewModel;
 
 
     @Override
@@ -60,6 +69,9 @@ public class AddNewSession extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_new_session);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_session);
+
+        sessionViewModel = new ViewModelProvider(this).get(SessionViewModel.class);
+
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         final View activityRootView = findViewById(R.id.activity_root_view);
@@ -69,13 +81,14 @@ public class AddNewSession extends AppCompatActivity {
                 binding.adView.setVisibility(View.INVISIBLE);
             } else {
                 binding.adView.setVisibility(View.VISIBLE);
-            } });
-
-        tuitionid = getIntent().getExtras().get("Tuition_id").toString();
+            }
+        });
+        userId = FirebaseAuth.getInstance().getUid();
+        bTId = getIntent().getExtras().get("bt_id").toString();
+        type = getIntent().getExtras().get("type").toString();
         completedDays = getIntent().getExtras().get("completedDays").toString();
         counter = Integer.parseInt(completedDays) + 1;
-
-
+        sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(userId).child(bTId);
 
 
         AdView adView = new AdView(this);
@@ -121,8 +134,6 @@ public class AddNewSession extends AppCompatActivity {
         });
 
 
-
-
         Calendar now = Calendar.getInstance();
         int yr = now.get(Calendar.YEAR);
         int mnth = now.get(Calendar.MONTH);
@@ -136,11 +147,10 @@ public class AddNewSession extends AppCompatActivity {
         Calendar cend = Calendar.getInstance();
         cend.setTimeInMillis(integerRepresentation + 3600000);
 
-        userId = FirebaseAuth.getInstance().getUid();
 
-        String myTimeFormat = "hh.mm a";
+        String myTimeFormat = "hh:mm";
         SimpleDateFormat stf = new SimpleDateFormat(myTimeFormat, Locale.US);
-        String myDateFormat = "dd.MM.yyyy";
+        String myDateFormat = "yyyy-MM-dd";
         SimpleDateFormat sdf = new SimpleDateFormat(myDateFormat, Locale.US);
 
 
@@ -184,33 +194,81 @@ public class AddNewSession extends AppCompatActivity {
             }, ehour, minte, false);
             nTime.show();
         });
-
+        GetSessionCounter();
         binding.addSessionBtnId.setOnClickListener(v -> {
-            if (validate() == 1) {
-                ShowLoadingDialog();
+
+            if (sessionCounter >= 20) {
+                Toast.makeText(AddNewSession.this, "Reached Maximum(20), delete old student or contact us", Toast.LENGTH_LONG).show();
+            } else if (validate() == 1) {
                 InsertNewSession();
             }
+
         });
 
     }
 
     private void InsertNewSession() {
-        DatabaseReference sessnRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionid).push();
-        id = sessnRef.getKey();
-        SessionInfo sessionInfo = new SessionInfo(id, date, day, time, etime, topic, String.valueOf(counter));
-        sessnRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
-            DatabaseReference cntRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(userId).child(tuitionid).getRef();
-            cntRef.child("completedDays").setValue(String.valueOf(counter));
-            alertDialog.dismiss();
+        ShowLoadingDialog();
+        id = sessionRef.push().getKey();
+        SessionInfo sessionInfo = new SessionInfo(id, bTId, type, date, day, time, etime, topic, userId, String.valueOf(counter));
+        sessionRef.setValue(sessionInfo).addOnSuccessListener(aVoid -> {
+
+            UpdateLocalDB(sessionInfo);
+
+        }).addOnFailureListener(e -> {
+            alert.dismiss();
+            Toast.makeText(AddNewSession.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        });
+
+    }
+
+    private void UpdateLocalDB(SessionInfo sessionInfo) {
+        Completable.fromAction(() ->
+                sessionViewModel.insertSessionInfo(sessionInfo)).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if (type.equals("tuition")) {
+                            SetCompletedCounter();
+                        } else {
+                            alert.dismiss();
+                            Toast.makeText(AddNewSession.this, "Added Successfully", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(AddNewSession.this, BatchDetails.class);
+                            intent.putExtra("Batch_id", bTId);
+                            startActivity(intent);
+                            finish();
+                            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                        }
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        alert.dismiss();
+                        Toast.makeText(AddNewSession.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void SetCompletedCounter() {
+
+        DatabaseReference cntRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(userId).child(bTId).getRef();
+        cntRef.child("completedDays").setValue(String.valueOf(counter)).addOnSuccessListener(aVoid -> {
+            alert.dismiss();
             Toast.makeText(AddNewSession.this, "Added Successfully", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(AddNewSession.this, TuitionDetails.class);
-            intent.putExtra("Tuition_id", tuitionid);
+            intent.putExtra("Tuition_id", bTId);
             startActivity(intent);
             finish();
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
         }).addOnFailureListener(e -> {
-            alertDialog.dismiss();
-            Toast.makeText(AddNewSession.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            alert.dismiss();
+            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         });
 
     }
@@ -274,10 +332,28 @@ public class AddNewSession extends AppCompatActivity {
         LayoutInflater inflater = AddNewSession.this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
         dialogBuilder.setView(dialogView);
-        alertDialog = dialogBuilder.create();
-        alertDialog.setCancelable(false);
-        alertDialog.show();
+        alert = dialogBuilder.create();
+        alert.setCancelable(false);
+        alert.show();
 
+    }
+
+    private void GetSessionCounter() {
+        sessionRef.child(userId).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                sessionCounter = dataSnapshot.getChildrenCount();
+
+                if (sessionCounter >= 20) {
+                    Toast.makeText(AddNewSession.this, "Reached Maximum limit(20), delete old session or contact us", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NotNull DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public static float dpToPx(Context context, float valueInDp) {

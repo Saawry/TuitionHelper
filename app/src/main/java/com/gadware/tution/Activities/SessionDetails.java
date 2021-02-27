@@ -23,8 +23,6 @@ import com.google.android.gms.ads.AdSize;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -37,16 +35,17 @@ import java.util.Locale;
 
 public class SessionDetails extends AppCompatActivity {
     ActivitySessionDetailsBinding binding;
-    private String  date, day, time, eTime, topic;
-    private String tuitionId,sessionId;
+    private String date, day, time, eTime, topic;
+    private String tuitionId, sessionId;
     DatabaseReference sessionRef;
     SessionInfo sessionInfo;
     private final Calendar myCalendar = Calendar.getInstance();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_session_details);
-        binding= DataBindingUtil.setContentView(this,R.layout.activity_session_details);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_session_details);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         final View activityRootView = findViewById(R.id.activity_root_view);
@@ -56,17 +55,13 @@ public class SessionDetails extends AppCompatActivity {
                 binding.adView.setVisibility(View.INVISIBLE);
             } else {
                 binding.adView.setVisibility(View.VISIBLE);
-            } });
+            }
+        });
 
 
-
-        sessionId=getIntent().getStringExtra("sessionId");
-        tuitionId=getIntent().getStringExtra("tuitionId");
+        sessionId = getIntent().getStringExtra("sessionId");
+        tuitionId = getIntent().getStringExtra("tuitionId");
         sessionRef = FirebaseDatabase.getInstance().getReference().child("Session List").child(tuitionId).child(sessionId);
-
-
-
-
 
 
         AdView adView = new AdView(this);
@@ -111,18 +106,16 @@ public class SessionDetails extends AppCompatActivity {
         });
 
 
-
-
         sessionRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                sessionInfo=new SessionInfo(snapshot.child("date").getValue().toString(),snapshot.child("day").getValue().toString(),
-                        snapshot.child("time").getValue().toString(),snapshot.child("eTime").getValue().toString(),
-                        snapshot.child("topic").getValue().toString());
+                sessionInfo = new SessionInfo(snapshot.child("id").getValue().toString(), snapshot.child("date").getValue().toString(), snapshot.child("day").getValue().toString(),
+                        snapshot.child("aTime").getValue().toString(), snapshot.child("sTime").getValue().toString(), snapshot.child("eTime").getValue().toString(),
+                        snapshot.child("topic").getValue().toString(), snapshot.child("tutor").getValue().toString(), snapshot.child("counter").getValue().toString());
 
                 binding.inputDate.setText(sessionInfo.getDate());
                 binding.inputDay.setText(sessionInfo.getDay());
-                binding.inputSTime.setText(sessionInfo.getTime());
+                binding.inputSTime.setText(sessionInfo.getsTime());
                 binding.inputETime.setText(sessionInfo.geteTime());
                 binding.inputTopic.setText(sessionInfo.getTopic());
             }
@@ -138,7 +131,7 @@ public class SessionDetails extends AppCompatActivity {
         int mnth = now.get(Calendar.MONTH);
         int dy = now.get(Calendar.DAY_OF_MONTH);
         int hour = now.get(Calendar.HOUR_OF_DAY);
-        int ehour = now.get(Calendar.HOUR_OF_DAY)+1;
+        int ehour = now.get(Calendar.HOUR_OF_DAY) + 1;
         int minte = now.get(Calendar.MINUTE);
 
         String myTimeFormat = "hh.mm a";
@@ -181,33 +174,32 @@ public class SessionDetails extends AppCompatActivity {
         });
 
 
-
-
         binding.addSessionBtnId.setOnClickListener(v -> {
 
-            date=binding.inputDate.getText().toString();
-            if (!date.equals(sessionInfo.getDate())){
-                Updatealue(date,"date");
+            date = binding.inputDate.getText().toString();
+            if (!date.equals(sessionInfo.getDate())) {
+                UpdateValue(date, "date");
             }
-            day=binding.inputDay.getText().toString();
-            if (!day.equals(sessionInfo.getDay())){
-                Updatealue(day,"day");
+            day = binding.inputDay.getText().toString();
+            if (!day.equals(sessionInfo.getDay())) {
+                UpdateValue(day, "day");
             }
-            time=binding.inputSTime.getText().toString();
-            if (!time.equals(sessionInfo.getTime())){
-                Updatealue(time,"time");
+            time = binding.inputSTime.getText().toString();
+            if (!time.equals(sessionInfo.getsTime())) {
+                UpdateValue(time, "time");
             }
-            eTime=binding.inputETime.getText().toString();
-            if (!eTime.equals(sessionInfo.geteTime())){
-                Updatealue(eTime,"eTime");
+            eTime = binding.inputETime.getText().toString();
+            if (!eTime.equals(sessionInfo.geteTime())) {
+                UpdateValue(eTime, "eTime");
             }
-            topic=binding.inputTopic.getText().toString();
-            if (!topic.equals(sessionInfo.getTopic())){
-                Updatealue(topic,"topic");
+            topic = binding.inputTopic.getText().toString();
+            if (!topic.equals(sessionInfo.getTopic())) {
+                UpdateValue(topic, "topic");
             }
         });
 
     }
+
     private String GetDAY(int today) {
         switch (today) {
             case Calendar.FRIDAY:
@@ -227,12 +219,13 @@ public class SessionDetails extends AppCompatActivity {
         }
         return "";
     }
-    private void Updatealue(String value, String key) {
+
+    private void UpdateValue(String value, String key) {
         sessionRef.child(key).setValue(value).addOnSuccessListener(aVoid -> {
-            Toast.makeText(this, "Updated "+key, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Updated " + key, Toast.LENGTH_SHORT).show();
 
         }).addOnFailureListener(e -> {
-            Toast.makeText(this, "Couldn't update "+key, Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Couldn't update " + key, Toast.LENGTH_SHORT).show();
         });
     }
 

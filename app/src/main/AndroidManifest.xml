@@ -18,6 +18,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.TuitionHelper">
+        <activity android:name=".backup.SyncDataActivity"></activity>
+        <activity android:name=".Activities.AddNewStudent" />
+        <activity android:name=".Activities.BatchDetails" />
+        <activity android:name=".Activities.AddNewBatch" />
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"

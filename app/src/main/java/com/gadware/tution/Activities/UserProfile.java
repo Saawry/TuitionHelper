@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 import android.Manifest;
@@ -37,6 +38,10 @@ import com.gadware.tution.asset.DocHelper;
 import com.gadware.tution.asset.EncryptedSharedPrefManager;
 import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityUserProfileBinding;
+import com.gadware.tution.models.Batch;
+import com.gadware.tution.models.ImageDetails;
+import com.gadware.tution.viewmodel.BatchViewModel;
+import com.gadware.tution.viewmodel.ImageViewModel;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -70,6 +75,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
 import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
 
@@ -79,12 +90,12 @@ public class UserProfile extends AppCompatActivity {
     private AlertDialog alertDialog;
     private AlertDialog alertDialogx;
     private AlertDialog alert;
-    String newValue="";
+    String newValue = "";
     List<String> dl = new ArrayList<>();
     StorageReference Storageref, tuitionImages;
     DatabaseReference userInfoRef, tuitionRef, scheduleRef, sessionRef;
     String muserId;
-    List<String> tuitionList = new ArrayList<>();
+    private ImageViewModel imageViewModel;
     private static final int PERMISSION_ALL = 222;
     private static final String[] PERMISSIONS = {
             android.Manifest.permission.READ_EXTERNAL_STORAGE,
@@ -100,7 +111,7 @@ public class UserProfile extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_user_profile);
 
         muserId = FirebaseAuth.getInstance().getUid();
-
+        imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
 
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
@@ -147,9 +158,9 @@ public class UserProfile extends AppCompatActivity {
         Storageref = FirebaseStorage.getInstance().getReference("Images").child(muserId + ".jpg");
         tuitionImages = FirebaseStorage.getInstance().getReference("Images");
         userInfoRef = FirebaseDatabase.getInstance().getReference("Users").child(muserId);
-        sessionRef = FirebaseDatabase.getInstance().getReference("Session List");
+        sessionRef = FirebaseDatabase.getInstance().getReference("Session List").child(muserId);
         tuitionRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(muserId);
-        scheduleRef = FirebaseDatabase.getInstance().getReference("Schedule List");
+        scheduleRef = FirebaseDatabase.getInstance().getReference("Schedule List").child(muserId);
         ShowDialog();
         RetrieveUserInfo();
         RetriveUserImage();
@@ -171,7 +182,7 @@ public class UserProfile extends AppCompatActivity {
             GetValueAndUpdate("name", binding.inputName.getText().toString());
         });
         binding.inputEmail.setOnClickListener(v -> {
-            GetValueAndUpdate("email", binding.inputEmail.getText().toString());
+            Toast.makeText(this, "You can't change Email Address", Toast.LENGTH_SHORT).show();
         });
         binding.inputMobile.setOnClickListener(v -> {
             GetValueAndUpdate("mobile", binding.inputMobile.getText().toString());
@@ -281,9 +292,6 @@ public class UserProfile extends AppCompatActivity {
         editor.apply();
 
 
-
-
-
         user.delete().addOnSuccessListener(aVoid -> {
             FirebaseAuth.getInstance().signOut();
             alertDialog.dismiss();
@@ -295,12 +303,12 @@ public class UserProfile extends AppCompatActivity {
         }).addOnFailureListener(e -> {
             alertDialog.dismiss();
             //binding.inputName.setText(e.getLocalizedMessage());
-            String email=FirebaseAuth.getInstance().getCurrentUser().getEmail();
+            String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
             GetPassword();
-            while (true){
-                if (newValue.isEmpty() || newValue.length()<6){
+            while (true) {
+                if (newValue.isEmpty() || newValue.length() < 6) {
                     GetPassword();
-                }else
+                } else
                     break;
             }
             assert email != null;
@@ -360,21 +368,18 @@ public class UserProfile extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 alertDialog.dismiss();
 
-                if (snapshot.hasChild("name")){
+                if (snapshot.hasChild("name")) {
                     binding.inputName.setText(Objects.requireNonNull(snapshot.child("name").getValue()).toString());
                 }
-                if (snapshot.hasChild("mobile")){
+                if (snapshot.hasChild("mobile")) {
                     binding.inputMobile.setText(Objects.requireNonNull(snapshot.child("mobile").getValue()).toString());
                 }
-                if (snapshot.hasChild("email")){
+                if (snapshot.hasChild("email")) {
                     binding.inputEmail.setText(Objects.requireNonNull(snapshot.child("email").getValue()).toString());
                 }
-                if (snapshot.hasChild("address")){
+                if (snapshot.hasChild("address")) {
                     binding.inputAddress.setText(Objects.requireNonNull(snapshot.child("address").getValue()).toString());
                 }
-
-
-
 
 
             }
@@ -442,13 +447,15 @@ public class UserProfile extends AppCompatActivity {
             return ref.getDownloadUrl();
         }).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Uri downloadUri = task.getResult();
-                assert downloadUri != null;
-                alertDialog.dismiss();
+                UpdateLocalDB(imageUri);
+                //Uri downloadUri = task.getResult();
+                //assert downloadUri != null;
+                //alertDialog.dismiss();
             }
-        }).addOnFailureListener(e ->
-                alertDialog.dismiss()
-        );
+        }).addOnFailureListener(e -> {
+            alertDialog.dismiss();
+            Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+        });
 
 
     }
@@ -465,7 +472,7 @@ public class UserProfile extends AppCompatActivity {
     }
 
 
-    private void GetPassword(){
+    private void GetPassword() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
 
         LayoutInflater inflater = this.getLayoutInflater();
@@ -483,11 +490,11 @@ public class UserProfile extends AppCompatActivity {
         );
 
         updateBtn.setOnClickListener(v -> {
-             newValue = editText.getText().toString();
-            if (newValue.equals("") || newValue.isEmpty() || newValue.length()<6) {
+            newValue = editText.getText().toString();
+            if (newValue.equals("") || newValue.isEmpty() || newValue.length() < 6) {
                 editText.setError("Password Length min 6");
 
-            }else{
+            } else {
                 alertDialogx.dismiss();
             }
         });
@@ -537,5 +544,27 @@ public class UserProfile extends AppCompatActivity {
         alertDialogx.show();
     }
 
+    private void UpdateLocalDB(byte[] imageBytes) {
+        Completable.fromAction(() ->
+                imageViewModel.insertSingleImage(new ImageDetails(muserId, "user", imageBytes))).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        alertDialog.dismiss();
+                        Toast.makeText(UserProfile.this, "Successful", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        alert.dismiss();
+                        Toast.makeText(UserProfile.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
 }

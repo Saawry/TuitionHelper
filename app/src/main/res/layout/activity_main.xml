@@ -57,19 +57,6 @@
 
         </LinearLayout>
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/favAddNewTuitionBtn"
-            android:layout_alignParentEnd="true"
-            android:tint="@color/white"
-            android:backgroundTint="@color/primary_dark"
-            android:src="@drawable/ic_baseline_add_circle_outline_24"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="76dp"
-            android:layout_marginEnd="20dp"
-            android:contentDescription="@string/todo"
-            tools:ignore="RelativeOverlap" />
 
         <LinearLayout
             android:visibility="visible"
@@ -101,6 +88,98 @@
             android:id="@+id/tuitionRecycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
+
+
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/fab_2lay"
+            android:layout_marginBottom="15dp"
+            android:layout_marginEnd="28dp"
+            android:layout_above="@+id/favBtn"
+            android:layout_alignParentEnd="true"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+            <TextView
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/speech_bubble"
+                android:id="@+id/tv_newSession"
+                android:textColor="@color/white"
+                android:paddingStart="10dp"
+                android:paddingEnd="5dp"
+                android:paddingTop="3dp"
+                android:visibility="invisible"
+                android:paddingBottom="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add new Batch" />
+
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabCustomSize="45dp"
+                android:visibility="invisible"
+                android:id="@+id/favAddNewBatchBtn"
+                android:tint="@color/white"
+                android:scaleType="center"
+                android:backgroundTint="@color/primary_dark"
+                android:src="@drawable/ic_baseline_library_add_24"
+                android:contentDescription="@string/todo" />
+        </LinearLayout>
+        <LinearLayout
+
+            android:layout_alignParentEnd="true"
+            android:layout_above="@+id/fab_2lay"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="28dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:id="@+id/fab_1lay">
+
+            <TextView
+                android:background="@drawable/speech_bubble"
+                android:layout_marginEnd="8dp"
+                android:id="@+id/tv_newTuition"
+                android:textColor="@color/white"
+                android:paddingStart="10dp"
+                android:paddingEnd="5dp"
+                android:paddingTop="3dp"
+                android:visibility="invisible"
+                android:paddingBottom="3dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Add new Tuition" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:fabCustomSize="45dp"
+                android:visibility="invisible"
+                android:id="@+id/favAddNewTuitionBtn"
+                android:tint="@color/white"
+                android:backgroundTint="@color/primary_dark"
+                android:src="@drawable/ic_baseline_add_circle_outline_24"
+                android:contentDescription="@string/todo"
+                tools:ignore="RelativeOverlap" />
+
+
+        </LinearLayout>
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/favBtn"
+            android:layout_alignParentEnd="true"
+            android:tint="@color/white"
+            android:backgroundTint="@color/primary_dark"
+            android:src="@drawable/ic_baseline_add_circle_24"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="76dp"
+            android:layout_marginEnd="20dp"
+            android:contentDescription="@string/todo"
+            tools:ignore="RelativeOverlap" />
+
         <com.google.android.gms.ads.AdView
             xmlns:ads="http://schemas.android.com/apk/res-auto"
             android:id="@+id/adView"

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,7 +42,9 @@ import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityTuitionDetailsBinding;
 import com.gadware.tution.databinding.SessionCardBinding;
 import com.gadware.tution.models.DaySchedule;
+import com.gadware.tution.models.ImageDetails;
 import com.gadware.tution.models.SessionInfo;
+import com.gadware.tution.viewmodel.ImageViewModel;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -66,6 +69,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.schedulers.Schedulers;
+
 public class TuitionDetails extends AppCompatActivity {
     private AlertDialog alertDialog;
     private AlertDialog alertDialogx;
@@ -88,7 +97,7 @@ public class TuitionDetails extends AppCompatActivity {
     private DatabaseReference sessionRef;
     private DatabaseReference tuitionInfoRef;
     private String mUserId, cTuitionId, completedDays, totalDays, mobile;
-
+    private ImageViewModel imageViewModel;
     List<DaySchedule> Schedule = new ArrayList<>();
     List<DaySchedule> NewDaySchedule = new ArrayList<>();
 
@@ -101,13 +110,13 @@ public class TuitionDetails extends AppCompatActivity {
         cTuitionId = getIntent().getExtras().get("Tuition_id").toString();
         mUserId = FirebaseAuth.getInstance().getUid();
         binding.sessionRecycler.setLayoutManager(new LinearLayoutManager(this));
+        imageViewModel = new ViewModelProvider(this).get(ImageViewModel.class);
 
         ShowLoadingDialog();
 
 
         AdView adView = new AdView(this);
         adView.setAdSize(AdSize.BANNER);
-        //adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
         adView.setAdUnitId("ca-app-pub-7098600576446460/4992449955");
 
         MobileAds.initialize(this, initializationStatus -> {
@@ -148,7 +157,7 @@ public class TuitionDetails extends AppCompatActivity {
 
         Storageref = FirebaseStorage.getInstance().getReference("Images").child(cTuitionId + ".jpg");
         tuitionInfoRef = FirebaseDatabase.getInstance().getReference("Tuition List").child(mUserId).child(cTuitionId);
-        sessionRef = FirebaseDatabase.getInstance().getReference("Session List").child(cTuitionId);
+        sessionRef = FirebaseDatabase.getInstance().getReference("Session List").child(mUserId).child(cTuitionId);
 
         RetriveTuitionInfo();
         RetriveScheduleInfo();
@@ -162,7 +171,8 @@ public class TuitionDetails extends AppCompatActivity {
         SimpleDateFormat sdf = new SimpleDateFormat(myDateFormat, Locale.US);
         binding.tuitionDAdnSsn.setOnClickListener(v -> {
             Intent nSession = new Intent(TuitionDetails.this, AddNewSession.class);
-            nSession.putExtra("Tuition_id", cTuitionId);
+            nSession.putExtra("bt_id", cTuitionId);
+            nSession.putExtra("type", "tuition");
             nSession.putExtra("completedDays", completedDays);
             startActivity(nSession);
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -368,43 +378,43 @@ public class TuitionDetails extends AppCompatActivity {
             if (satCB.isChecked()) {
                 String time = satEt.getText().toString();
                 if (!TextUtils.isEmpty(time) && time.length() > 5) {
-                    NewDaySchedule.add(new DaySchedule("SAT", time));
+                    NewDaySchedule.add(new DaySchedule(cTuitionId,"SAT", time,"tuition"));
                 }
             }
             if (sunCB.isChecked()) {
                 String time = sunEt.getText().toString();
                 if (!TextUtils.isEmpty(time) && time.length() > 5) {
-                    NewDaySchedule.add(new DaySchedule("SUN", time));
+                    NewDaySchedule.add(new DaySchedule(cTuitionId,"SUN", time,"tuition"));
                 }
             }
             if (monCB.isChecked()) {
                 String time = monEt.getText().toString();
                 if (!TextUtils.isEmpty(time) && time.length() > 5) {
-                    NewDaySchedule.add(new DaySchedule("MON", time));
+                    NewDaySchedule.add(new DaySchedule(cTuitionId,"MON", time,"tuition"));
                 }
             }
             if (tueCB.isChecked()) {
                 String time = tueEt.getText().toString();
                 if (!TextUtils.isEmpty(time) && time.length() > 5) {
-                    NewDaySchedule.add(new DaySchedule("TUE", time));
+                    NewDaySchedule.add(new DaySchedule(cTuitionId,"TUE", time,"tuition"));
                 }
             }
             if (wedCB.isChecked()) {
                 String time = wedEt.getText().toString();
                 if (!TextUtils.isEmpty(time) && time.length() > 5) {
-                    NewDaySchedule.add(new DaySchedule("WED", time));
+                    NewDaySchedule.add(new DaySchedule(cTuitionId,"WED", time,"tuition"));
                 }
             }
             if (thuCB.isChecked()) {
                 String time = thuEt.getText().toString();
                 if (!TextUtils.isEmpty(time) && time.length() > 5) {
-                    NewDaySchedule.add(new DaySchedule("THU", time));
+                    NewDaySchedule.add(new DaySchedule(cTuitionId,"THU", time,"tuition"));
                 }
             }
             if (friCB.isChecked()) {
                 String time = friEt.getText().toString();
                 if (!TextUtils.isEmpty(time) && time.length() > 5) {
-                    NewDaySchedule.add(new DaySchedule("FRI", time));
+                    NewDaySchedule.add(new DaySchedule(cTuitionId,"FRI", time,"tuition"));
                 }
             }
             if (NewDaySchedule.size() > 0) {
@@ -432,17 +442,17 @@ public class TuitionDetails extends AppCompatActivity {
     private void AddSchedules(String id) {
         binding.tuitionDDSpin.setText("");
         FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId).child(id).child("weeklyDays").setValue(String.valueOf(NewDaySchedule.size()));
-        FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id).removeValue();
+        FirebaseDatabase.getInstance().getReference().child("Schedule List").child(mUserId).child(id).removeValue();
         for (DaySchedule daySchedule : NewDaySchedule) {
             binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " " + daySchedule.getDayName());
-            DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(id);
+            DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(mUserId).child(id);
             ScheduleRef.child(daySchedule.getDayName()).setValue(daySchedule.getTime());
         }
 
     }
 
     private void RetriveScheduleInfo() {
-        DatabaseReference scheduleRef = FirebaseDatabase.getInstance().getReference("Schedule List").child(cTuitionId).getRef();
+        DatabaseReference scheduleRef = FirebaseDatabase.getInstance().getReference("Schedule List").child(mUserId).child(cTuitionId).getRef();
         scheduleRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -450,43 +460,43 @@ public class TuitionDetails extends AppCompatActivity {
                 binding.tuitionDDSpin.setText("");
                 if (snapshot.child("SAT").exists()) {
                     String Time = Objects.requireNonNull(snapshot.child("SAT").getValue()).toString();
-                    Schedule.add(new DaySchedule("SAT", Time));
+                    Schedule.add(new DaySchedule(cTuitionId,"SAT", Time,"tuition"));
                     binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " SAT");
                 }
 
                 if (snapshot.child("SUN").exists()) {
                     String Time = Objects.requireNonNull(snapshot.child("SUN").getValue()).toString();
-                    Schedule.add(new DaySchedule("SUN", Time));
+                    Schedule.add(new DaySchedule(cTuitionId,"SUN", Time,"tuition"));
                     binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " SUN");
                 }
 
                 if (snapshot.child("MON").exists()) {
                     String Time = Objects.requireNonNull(snapshot.child("MON").getValue()).toString();
-                    Schedule.add(new DaySchedule("MON", Time));
+                    Schedule.add(new DaySchedule(cTuitionId,"MON", Time,"tuition"));
                     binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " MON");
                 }
 
                 if (snapshot.child("TUE").exists()) {
                     String Time = Objects.requireNonNull(snapshot.child("TUE").getValue()).toString();
-                    Schedule.add(new DaySchedule("TUE", Time));
+                    Schedule.add(new DaySchedule(cTuitionId,"TUE", Time,"tuition"));
                     binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " TUE");
                 }
 
                 if (snapshot.child("WED").exists()) {
                     String Time = Objects.requireNonNull(snapshot.child("WED").getValue()).toString();
-                    Schedule.add(new DaySchedule("WED", Time));
+                    Schedule.add(new DaySchedule(cTuitionId,"WED", Time,"tuition"));
                     binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " WED");
                 }
 
                 if (snapshot.child("THU").exists()) {
                     String Time = Objects.requireNonNull(snapshot.child("THU").getValue()).toString();
-                    Schedule.add(new DaySchedule("THU", Time));
+                    Schedule.add(new DaySchedule(cTuitionId,"THU", Time,"tuition"));
                     binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " THU");
                 }
 
                 if (snapshot.child("FRI").exists()) {
                     String Time = Objects.requireNonNull(snapshot.child("FRI").getValue()).toString();
-                    Schedule.add(new DaySchedule("FRI", Time));
+                    Schedule.add(new DaySchedule(cTuitionId,"FRI", Time ,"tuition"));
                     binding.tuitionDDSpin.setText(binding.tuitionDDSpin.getText() + " FRI");
                 }
 
@@ -549,7 +559,7 @@ public class TuitionDetails extends AppCompatActivity {
     }
 
     private void RetriveSessionInfoList() {
-        sessionRef = FirebaseDatabase.getInstance().getReference("Session List").child(cTuitionId);
+        sessionRef = FirebaseDatabase.getInstance().getReference("Session List").child(mUserId).child(cTuitionId);
 
         FirebaseRecyclerOptions<SessionInfo> options = new FirebaseRecyclerOptions.Builder<SessionInfo>().setQuery(sessionRef, SessionInfo.class).build();
         final FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder> adapter = new FirebaseRecyclerAdapter<SessionInfo, SessionsViewHolder>(options) {
@@ -557,6 +567,7 @@ public class TuitionDetails extends AppCompatActivity {
             protected void onBindViewHolder(@NonNull final SessionsViewHolder holder, int position, @NonNull SessionInfo model) {
 
                 final String SessionIDs = getRef(position).getKey();
+                assert SessionIDs != null;
                 sessionRef.child(SessionIDs).addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -697,9 +708,10 @@ public class TuitionDetails extends AppCompatActivity {
             return ref.getDownloadUrl();
         }).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Uri downloadUri = task.getResult();
-                assert downloadUri != null;
-                alertDialog.dismiss();
+                UpdateLocalDB(imageUri);
+//                Uri downloadUri = task.getResult();
+//                assert downloadUri != null;
+//                alertDialog.dismiss();
             }
         }).addOnFailureListener(e -> alertDialog.dismiss());
     }
@@ -813,7 +825,28 @@ public class TuitionDetails extends AppCompatActivity {
         }, hour, minte, false);
         nTime.show();
     }
+    private void UpdateLocalDB(byte[] imageBytes) {
+        Completable.fromAction(() ->
+                imageViewModel.insertSingleImage(new ImageDetails(cTuitionId, "tuition", imageBytes))).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
 
+                    @Override
+                    public void onComplete() {
+                        alertDialog.dismiss();
+                        Toast.makeText(TuitionDetails.this, "Successful", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        alert.dismiss();
+                        Toast.makeText(TuitionDetails.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
     @Override
     public void onBackPressed() {
         super.onBackPressed();

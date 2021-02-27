@@ -28,6 +28,7 @@ import com.firebase.ui.database.SnapshotParser;
 import com.gadware.tution.R;
 import com.gadware.tution.asset.DocHelper;
 import com.gadware.tution.asset.EncryptedSharedPrefManager;
+import com.gadware.tution.asset.FabHelper;
 import com.gadware.tution.asset.ImageHelper;
 import com.gadware.tution.databinding.ActivityMainBinding;
 import com.gadware.tution.databinding.TuitionCardBinding;
@@ -68,8 +69,9 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseUser mUser;
     private DatabaseReference tuitionRef;
 
-    private String mUserId,SharedId="null";
+    private String mUserId, SharedId = "null";
     StorageReference Storageref;
+    int isOpen = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,24 +90,24 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
         try {
-            SharedId= sharedPreferences.getString("UserID", "null");
+            SharedId = sharedPreferences.getString("UserID", "null");
         } catch (Exception e) {
             //Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         }
 
 
-        if (mUser==null || SharedId.equals("null")){
+        if (mUser == null || SharedId.equals("null")) {
             startActivity(new Intent(this, LoginActivity.class));
             finish();
             overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-        }else{
+        } else {
             try {
-                mUserId=mUser.getUid();
+                mUserId = mUser.getUid();
             } catch (NullPointerException e) {
                 startActivity(new Intent(MainActivity.this, LoginActivity.class));
                 finish();
                 overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
-            }finally {
+            } finally {
                 Showialog();
                 RetriveImage();
                 tuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
@@ -115,10 +117,6 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-
-
-
-
         binding.ProfileIcon.setOnClickListener(v -> {
 
                     startActivity(new Intent(MainActivity.this, UserProfile.class));
@@ -126,15 +124,23 @@ public class MainActivity extends AppCompatActivity {
                 }
         );
 
-        binding.favAddNewTuitionBtn.setOnClickListener(v -> {
-                    startActivity(new Intent(MainActivity.this, AddNewTuition.class));
-                    overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+        binding.favBtn.setOnClickListener(v -> {
+
+                    isOpen=FabHelper.animateFAB(this, isOpen, binding.favBtn, binding.favAddNewBatchBtn, binding.favAddNewTuitionBtn,binding.tvNewSession,binding.tvNewTuition);
                 }
 
         );
 
+        binding.favAddNewTuitionBtn.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, AddNewTuition.class));
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+        });
 
+        binding.favAddNewBatchBtn.setOnClickListener(v -> {
 
+            startActivity(new Intent(MainActivity.this, AddNewBatch.class));
+            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+        });
 
 
         AdView adView = new AdView(this);

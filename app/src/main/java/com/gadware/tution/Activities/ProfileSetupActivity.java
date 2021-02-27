@@ -3,6 +3,7 @@ package com.gadware.tution.Activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.security.crypto.EncryptedSharedPreferences;
 
 import android.app.AlertDialog;
@@ -20,6 +21,7 @@ import com.gadware.tution.asset.DocHelper;
 import com.gadware.tution.asset.EncryptedSharedPrefManager;
 import com.gadware.tution.models.User;
 import com.gadware.tution.databinding.ActivityProfileSetupBinding;
+import com.gadware.tution.viewmodel.UserViewModel;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
@@ -32,6 +34,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import io.reactivex.Completable;
+import io.reactivex.CompletableObserver;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.schedulers.Schedulers;
+
 import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
 import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
 
@@ -41,6 +50,7 @@ public class ProfileSetupActivity extends AppCompatActivity {
     private String email, password, rePass, address, mobile, uid, name;
     private ActivityProfileSetupBinding binding;
     private AlertDialog alertDialog;
+    private UserViewModel userViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,10 +58,10 @@ public class ProfileSetupActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile_setup);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile_setup);
 
+        userViewModel = new ViewModelProvider(this).get(UserViewModel.class);
         mAuth = FirebaseAuth.getInstance();
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-
 
 
         email = binding.inputEmail.getText().toString();
@@ -84,29 +94,12 @@ public class ProfileSetupActivity extends AppCompatActivity {
                         FirebaseUser mmuser = mAuth.getCurrentUser();
                         assert mmuser != null;
                         uid = mmuser.getUid();
-                        User user = new User(uid, email, address, mobile, name);
+                        User user = new User(uid, email, address, mobile, name, "Owner");
                         userRef = FirebaseDatabase.getInstance().getReference("Users").getRef();
                         userRef.child(uid).child("UserInfo").setValue(user).addOnSuccessListener(aVoid -> {
-                            alertDialog.dismiss();
 
+                            UpdateLocalDB(user);
 
-                            SharedPreferences sharedPreferences = null;
-                            try {
-                                sharedPreferences = EncryptedSharedPreferences.create(this, "mysecuredata.txt", DocHelper.getMKey(this), AES256_SIV, AES256_GCM);
-                            } catch (GeneralSecurityException | IOException e) {
-                                Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                            }
-
-                            SharedPreferences.Editor editor = sharedPreferences.edit();
-                            editor.putString("UserID", uid);
-                            editor.apply();
-
-
-
-                            Toast.makeText(this, "Successful", Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(ProfileSetupActivity.this, MainActivity.class));
-                            finish();
-                            overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
                         }).addOnFailureListener(e -> {
                             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
                         });
@@ -132,6 +125,45 @@ public class ProfileSetupActivity extends AppCompatActivity {
                     }
                 });
 
+    }
+
+    private void UpdateLocalDB(User user) {
+        Completable.fromAction(() ->
+                userViewModel.insertUserInfo(user)).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        alertDialog.dismiss();
+                        Toast.makeText(ProfileSetupActivity.this, "inserted", Toast.LENGTH_SHORT).show();
+                        SharedPreferences sharedPreferences = null;
+                        try {
+                            sharedPreferences = EncryptedSharedPreferences.create(ProfileSetupActivity.this, "mysecuredata.txt", DocHelper.getMKey(ProfileSetupActivity.this), AES256_SIV, AES256_GCM);
+                        } catch (GeneralSecurityException | IOException e) {
+                            Toast.makeText(ProfileSetupActivity.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        }
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("UserID", uid);
+                        editor.apply();
+
+
+                        Toast.makeText(ProfileSetupActivity.this, "Successful", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(ProfileSetupActivity.this, MainActivity.class));
+                        finish();
+                        overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+                });
     }
 
     public int validate() {
@@ -196,10 +228,11 @@ public class ProfileSetupActivity extends AppCompatActivity {
         alertDialog.setCancelable(false);
         alertDialog.show();
     }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        startActivity(new Intent(ProfileSetupActivity.this,LoginActivity.class));
+        startActivity(new Intent(ProfileSetupActivity.this, LoginActivity.class));
         finish();
         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
     }

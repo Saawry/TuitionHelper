@@ -1,19 +1,35 @@
 package com.gadware.tution.models;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "UserInfo")
 public class User {
-    private String uid,email,address, mobile,name;
+    @PrimaryKey
+    private String uid;
+    private String email;
+    private String address;
+    private String mobile;
+    private String name;
+    private String status;
 
-    public User() {
-    }
-
-    public User(String uid, String email,  String address, String mobile, String name ) {
+    public User(String uid, String name,String email, String address, String mobile, String status) {
         this.uid = uid;
+        this.name = name;
         this.email = email;
         this.address = address;
         this.mobile = mobile;
-        this.name = name;
+        this.status = status;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getName() {
         return name;

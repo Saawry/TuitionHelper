@@ -1,6 +1,12 @@
 package com.gadware.tution.models;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+
+@Entity
 public class TuitionInfo {
+    @PrimaryKey
     private String id;
     private String studentName;
     private String location;
@@ -12,8 +18,6 @@ public class TuitionInfo {
     private String sDate;
     private String eDate;
 
-    public TuitionInfo() {
-    }
 
     public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration, String sDate, String eDate) {
         this.id = id;
@@ -26,21 +30,6 @@ public class TuitionInfo {
         this.remuneration = remuneration;
         this.sDate = sDate;
         this.eDate = eDate;
-    }
-
-
-
-
-
-    public TuitionInfo(String id, String studentName, String location, String mobile, String totalDays, String completedDays, String weeklyDays, String remuneration) {
-        this.id = id;
-        this.studentName = studentName;
-        this.location = location;
-        this.mobile = mobile;
-        this.totalDays = totalDays;
-        this.completedDays = completedDays;
-        this.weeklyDays = weeklyDays;
-        this.remuneration = remuneration;
     }
 
     public String getId() {

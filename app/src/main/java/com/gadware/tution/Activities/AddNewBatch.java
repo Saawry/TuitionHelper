@@ -1,35 +1,37 @@
 package com.gadware.tution.Activities;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.databinding.DataBindingUtil;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.security.crypto.EncryptedSharedPreferences;
+
 import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
-
 import com.gadware.tution.R;
-import com.gadware.tution.databinding.ActivityAddNewTuitionBinding;
+import com.gadware.tution.asset.DocHelper;
+import com.gadware.tution.databinding.ActivityAddNewBatchBinding;
+import com.gadware.tution.models.Batch;
 import com.gadware.tution.models.DaySchedule;
 import com.gadware.tution.models.TuitionInfo;
+import com.gadware.tution.models.User;
+import com.gadware.tution.viewmodel.BatchViewModel;
 import com.gadware.tution.viewmodel.ScheduleViewModel;
-import com.gadware.tution.viewmodel.SessionViewModel;
-import com.gadware.tution.viewmodel.TuitionViewModel;
+import com.gadware.tution.viewmodel.UserViewModel;
 import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdSize;
@@ -37,6 +39,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.LoadAdError;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,6 +47,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -54,48 +61,47 @@ import io.reactivex.Completable;
 import io.reactivex.CompletableObserver;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Action;
 import io.reactivex.schedulers.Schedulers;
 
-public class AddNewTuition extends AppCompatActivity {
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV;
+import static androidx.security.crypto.EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM;
 
-    ActivityAddNewTuitionBinding binding;
-    private String id, studentName, location, mobile, totalDays, completedDays, weeklyDays, remuneration;
-    private AlertDialog alertDialog, alert;
-    private DatabaseReference TuitionRef;
+public class AddNewBatch extends AppCompatActivity {
+
+    ActivityAddNewBatchBinding binding;
+    private DatabaseReference BatchRef;
     private String mUserId;
-    private long tuitionCounter = 0;
-    private TuitionViewModel tuitionViewModel;
-    private ScheduleViewModel scheduleViewModel;
+    private String id, className, subject, studentAmount, weeklyDays, remuneration;
     private String satT, sunT, monT, tueT, wedT, thuT, friT;
+    private AlertDialog alertDialog, alert;
+    private long BatchCounter = 0;
+    private BatchViewModel batchViewModel;
+    private ScheduleViewModel scheduleViewModel;
     List<DaySchedule> daySchedules = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_new_tuition);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_tuition);
+        setContentView(R.layout.activity_add_new_batch);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_add_new_batch);
 
-        tuitionViewModel = new ViewModelProvider(this).get(TuitionViewModel.class);
+        batchViewModel = new ViewModelProvider(this).get(BatchViewModel.class);
         scheduleViewModel = new ViewModelProvider(this).get(ScheduleViewModel.class);
 
-
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         final View activityRootView = findViewById(R.id.activity_root_view);
         activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
             int heightDiff = activityRootView.getRootView().getHeight() - activityRootView.getHeight();
-            if (heightDiff > dpToPx(AddNewTuition.this, 100)) {
+            if (heightDiff > dpToPx(AddNewBatch.this, 100)) {
                 binding.adView.setVisibility(View.INVISIBLE);
             } else {
                 binding.adView.setVisibility(View.VISIBLE);
             }
         });
 
-
         mUserId = FirebaseAuth.getInstance().getUid();
 
-        TuitionRef = FirebaseDatabase.getInstance().getReference().child("Tuition List").child(mUserId);
-        id = TuitionRef.push().getKey();
+        BatchRef = FirebaseDatabase.getInstance().getReference().child("Batch List").child(mUserId);
+        id = BatchRef.push().getKey();
 
 
         AdView adView = new AdView(this);
@@ -140,35 +146,57 @@ public class AddNewTuition extends AppCompatActivity {
         });
 
 
-        GetTuitionCounter();
+        GetBatchCounter();
 
         binding.inputWeeklyDays.setOnClickListener(v -> {
             getWeeklySchedule();
         });
 
-        binding.addTuitionBtnId.setOnClickListener(v -> {
-            if (tuitionCounter >= 10) {
-                Toast.makeText(AddNewTuition.this, "Reached Maximum(10), delete old tuition or contact us", Toast.LENGTH_LONG).show();
+        binding.addBatchBtnId.setOnClickListener(v -> {
+            if (BatchCounter >= 4) {
+                Toast.makeText(AddNewBatch.this, "Reached Maximum limit(4), delete old or contact us", Toast.LENGTH_LONG).show();
             } else if (validate() == 1) {
-                InitNewTuition();
+                InitNewBatch();
             }
         });
-
     }
 
-    private void GetTuitionCounter() {
-        TuitionRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                tuitionCounter = dataSnapshot.getChildrenCount();
 
-                if (tuitionCounter >= 10) {
-                    Toast.makeText(AddNewTuition.this, "Reached Maximum(10), delete old tuition or contact us", Toast.LENGTH_LONG).show();
+    private void UpdateLocalDB(Batch batch) {
+        Completable.fromAction(() ->
+                batchViewModel.insertBatchInfo(batch)).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe(new CompletableObserver() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        AddSchedules(id);
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        alert.dismiss();
+                        Toast.makeText(AddNewBatch.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void GetBatchCounter() {
+        BatchRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NotNull DataSnapshot dataSnapshot) {
+                BatchCounter = dataSnapshot.getChildrenCount();
+
+                if (BatchCounter >= 4) {
+                    Toast.makeText(AddNewBatch.this, "Reached Maximum limit(4), delete old Batch or contact us", Toast.LENGTH_LONG).show();
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NotNull DatabaseError databaseError) {
 
             }
         });
@@ -177,9 +205,9 @@ public class AddNewTuition extends AppCompatActivity {
 
     private void getWeeklySchedule() {
 
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(AddNewTuition.this);
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(AddNewBatch.this);
 // ...Irrelevant code for customizing the buttons and title
-        LayoutInflater inflater = AddNewTuition.this.getLayoutInflater();
+        LayoutInflater inflater = AddNewBatch.this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.weekly_days_select, null);
         dialogBuilder.setView(dialogView);
 
@@ -284,55 +312,34 @@ public class AddNewTuition extends AppCompatActivity {
         }
     }
 
-    private void InitNewTuition() {
+    private void InitNewBatch() {
         ShowLoadingDialog();
-        TuitionInfo tuitionInfo = new TuitionInfo(id, studentName, location, mobile, totalDays, completedDays, weeklyDays, remuneration,"0000-00-00","0000-00-00");
-        assert id != null;
-        TuitionRef.child(id).setValue(tuitionInfo).addOnSuccessListener(aVoid -> {
-            UpdateLocalTuitionDB(tuitionInfo);
 
+        Batch batch = new Batch(id, className, subject, studentAmount, remuneration, weeklyDays);
+        assert id != null;
+        BatchRef.child(id).setValue(batch).addOnSuccessListener(aVoid -> {
+            UpdateLocalDB(batch);
         }).addOnFailureListener(e -> {
             alert.dismiss();
-            Toast.makeText(AddNewTuition.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(AddNewBatch.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
         });
 
     }
 
-    private void UpdateLocalTuitionDB(TuitionInfo tuitionInfo) {
-        Completable.fromAction(() -> tuitionViewModel.insertTuitionInfo(tuitionInfo)).observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new CompletableObserver() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                    }
-
-                    @Override
-                    public void onComplete() {
-
-                        AddSchedules(id);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        alert.dismiss();
-                        Toast.makeText(AddNewTuition.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
-    }
-
     private void AddSchedules(String id) {
-        boolean flag[] = {true};
+        final boolean[] ok = {true};
         for (DaySchedule daySchedule : daySchedules) {
             DatabaseReference ScheduleRef = FirebaseDatabase.getInstance().getReference().child("Schedule List").child(mUserId).child(id);
             ScheduleRef.child(daySchedule.getDayName()).setValue(daySchedule.getTime()).addOnFailureListener(e -> {
+                ok[0] = false;
                 alert.dismiss();
-                flag[0] = false;
+                Toast.makeText(this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             });
         }
-        if (flag[0]) {
+        if (ok[0]) {
             UpdateLocalSchedule(daySchedules);
         } else {
-            Toast.makeText(this, "Error", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "error", Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -349,8 +356,8 @@ public class AddNewTuition extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         alert.dismiss();
-                        Intent intent = new Intent(AddNewTuition.this, BatchDetails.class);
-                        intent.putExtra("Tuition_id", id);
+                        Intent intent = new Intent(AddNewBatch.this, BatchDetails.class);
+                        intent.putExtra("Batch_id", id);
                         startActivity(intent);
                         finish();
                         overridePendingTransition(R.anim.push_left_in, R.anim.push_left_out);
@@ -359,70 +366,55 @@ public class AddNewTuition extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         alert.dismiss();
-                        Toast.makeText(AddNewTuition.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(AddNewBatch.this, e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                     }
                 });
+
+
     }
 
     public int validate() {
 
-        studentName = binding.inputStudentName.getText().toString();
-        if (studentName.isEmpty() || studentName.length() < 4) {
-            binding.inputStudentName.setError("enter a valid name");
+        className = binding.inputClass.getText().toString();
+        if (className.isEmpty() || className.length() < 3) {
+            binding.inputClass.setError("invalid(ex: nine)");
             return 0;
         } else {
-            binding.inputStudentName.setError(null);
+            binding.inputClass.setError(null);
         }
 
 
-        location = binding.inputLocation.getText().toString();
-        if (location.isEmpty() || location.length() < 4) {
-            binding.inputLocation.setError("enter a valid location");
+        subject = binding.inputSubject.getText().toString();
+        if (subject.isEmpty() || subject.length() < 3) {
+            binding.inputSubject.setError("enter a valid subject");
             return 0;
         } else {
-            binding.inputLocation.setError(null);
+            binding.inputSubject.setError(null);
         }
 
-        mobile = binding.inputMobile.getText().toString();
-        if (mobile.isEmpty() || mobile.length() < 10) {
-            binding.inputMobile.setError("enter a valid mobile number");
+        studentAmount = binding.inputStudentsAmount.getText().toString();
+        if (studentAmount.isEmpty()) {
+            binding.inputStudentsAmount.setError("enter student Amount");
             return 0;
         } else {
-            binding.inputMobile.setError(null);
+            binding.inputStudentsAmount.setError(null);
         }
 
-        totalDays = binding.inputTotalDays.getText().toString();
-        if (totalDays.isEmpty()) {
-            binding.inputTotalDays.setError("enter days amount");
+        remuneration = binding.inputRemuneration.getText().toString();
+        if (remuneration.isEmpty() || remuneration.length() < 3) {
+            binding.inputRemuneration.setError("enter monthly salary");
             return 0;
         } else {
-            binding.inputTotalDays.setError(null);
-        }
-
-        completedDays = binding.inputCompletedDays.getText().toString();
-        if (completedDays.isEmpty()) {
-            binding.inputCompletedDays.setError("enter days amount");
-            return 0;
-        } else {
-            binding.inputCompletedDays.setError(null);
+            binding.inputRemuneration.setError(null);
         }
 
 
         weeklyDays = String.valueOf(daySchedules.size());
         if (weeklyDays.isEmpty() || weeklyDays.equals("0")) {
-            binding.inputWeeklyDays.setError("enter weekly days");
+            binding.inputWeeklyDays.setError("select schedule");
             return 0;
         } else {
             binding.inputWeeklyDays.setError(null);
-        }
-
-
-        remuneration = binding.inputRemuneration.getText().toString();
-        if (remuneration.isEmpty() || remuneration.length() < 2) {
-            binding.inputRemuneration.setError("min 2 digit amount");
-            return 0;
-        } else {
-            binding.inputRemuneration.setError(null);
         }
 
         return 1;
@@ -430,7 +422,7 @@ public class AddNewTuition extends AppCompatActivity {
 
     private void ShowClock(TextView tv) {
         Calendar myCalendar = Calendar.getInstance();
-        String myTimeFormat = "hh:mm";
+        String myTimeFormat = "hh.mm a";
 
         SimpleDateFormat stf = new SimpleDateFormat(myTimeFormat, Locale.US);
         Calendar now = Calendar.getInstance();
@@ -441,6 +433,7 @@ public class AddNewTuition extends AppCompatActivity {
         TimePickerDialog nTime = new TimePickerDialog(this, R.style.datepicker, (view, hourOfDay, minute) -> {
             myCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             myCalendar.set(Calendar.MINUTE, minute);
+
 
             tv.setText(stf.format(myCalendar.getTime()));
             int hh = myCalendar.get(Calendar.HOUR_OF_DAY) - 1;
@@ -488,8 +481,8 @@ public class AddNewTuition extends AppCompatActivity {
     }
 
     private void ShowLoadingDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(AddNewTuition.this);
-        LayoutInflater inflater = AddNewTuition.this.getLayoutInflater();
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(AddNewBatch.this);
+        LayoutInflater inflater = AddNewBatch.this.getLayoutInflater();
         View dialogView = inflater.inflate(R.layout.loading_bar_dialog, null);
         dialogBuilder.setView(dialogView);
         alert = dialogBuilder.create();
